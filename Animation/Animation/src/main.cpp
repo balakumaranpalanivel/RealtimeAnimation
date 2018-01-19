@@ -17,13 +17,56 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "CShader.h"
+#include "CModel.h"
+
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
+const unsigned int SCR_WIDTH = 1200;
+const unsigned int SCR_HEIGHT = 600;
+
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
 
 using namespace std;
 
+CShader ourShader;
+CModel ourModel;
+
 int width = 800.0;
 int height = 600.0;
+
+// Camera
+glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH/2) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
+
+glm::vec3 translateVector = glm::vec3(0.0f, -1.75f, 0.0f);
+glm::vec3 scaleVector = glm::vec3(0.2f, 0.2f, 0.2f);
+
+glm::mat4 model;
+glm::mat4 orthoProjection;
+glm::mat4 orthoView;
+
+static double  last_time = 0;
+float radius = 10.0f;
+double curr_time;
+double delta;
+bool firstMouse = true;
+
+/*
+	Declaring initiali values for the Euler angles
+	Not defining "roll" angle for camera
+*/
+// Yaw is rotation of the object about the Y axis (look left/right)
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+
+// Pitch is rotation of the object about the x axis (look up/down)
+float pitch = 0.0f;
 
 // Shader Functions- click on + to expand
 #pragma region SHADER_FUNCTIONS
@@ -167,9 +210,33 @@ void linkCurrentBuffertoShader(GLuint shaderProgramID) {
 
 void display()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	// NB: Make the call to draw the geometry in the currently activated vertex buffer. This is where the GPU starts to work!
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	// tell GL to only draw onto a pixel if the shape is closer to the viewer
+	glEnable(GL_DEPTH_TEST); // enable depth-testing
+	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
+	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	ourShader.Use();
+
+	// Perspective projection viewport
+	glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
+	ourShader.SetMat4("projection", projection);
+	ourShader.SetMat4("view", view);
+	ourShader.SetMat4("model", model);
+	ourShader.SetVec3("viewPos", cameraPos);
+	ourModel.Draw(ourShader);
+
+	// Orthographic projection viewport
+	glViewport(SCR_WIDTH / 2, 0, SCR_WIDTH / 2, SCR_HEIGHT);
+	orthoProjection = glm::ortho<float>(-2.0f, 2.0f, -2.0f, 2.0f, -200.0f, 200.0f);
+	ourShader.SetMat4("projection", orthoProjection);
+	orthoView = glm::lookAt(
+		glm::vec3(1.0f, 1.5f, 1.5f),
+		glm::vec3(0, 0, 0),
+		cameraUp);
+	ourShader.SetMat4("view", orthoView);
+	ourShader.SetMat4("model", model);
+	ourShader.SetVec3("viewPos", cameraPos);
+	ourModel.Draw(ourShader);
 }
 
 GLFWwindow* window;
@@ -177,24 +244,38 @@ const GLFWvidmode* videMode;
 
 void initScene()
 {
-	// Create 3 vertices that make up a triangle that fits on the viewport 
-	GLfloat vertices[] = { -1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f };
-	// Create a color array that identfies the colors of each vertex (format R, G, B, A)
-	GLfloat colors[] = { 0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f };
+	//// Create 3 vertices that make up a triangle that fits on the viewport 
+	//GLfloat vertices[] = { -1.0f, -1.0f, 0.0f,
+	//	1.0f, -1.0f, 0.0f,
+	//	0.0f, 1.0f, 0.0f };
+	//// Create a color array that identfies the colors of each vertex (format R, G, B, A)
+	//GLfloat colors[] = { 0.0f, 1.0f, 0.0f, 1.0f,
+	//	1.0f, 0.0f, 0.0f, 1.0f,
+	//	0.0f, 0.0f, 1.0f, 1.0f };
+
+	//// Set up the shaders
+	//GLuint shaderProgramID = CompileShaders("../Animation/src/shaders/diffuse.vs",
+	//	"../Animation/src/shaders/diffuse.ps");
+
+	//// Put the vertices and colors into a vertex buffer object
+	//generateObjectBuffer(vertices, colors);
+
+	//// Link the current buffer to the shader
+	//linkCurrentBuffertoShader(shaderProgramID);
 
 	// Set up the shaders
-	GLuint shaderProgramID = CompileShaders("../Animation/src/shaders/diffuse.vs",
-		"../Animation/src/shaders/diffuse.ps");
+	ourShader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
+		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
 
-	// Put the vertices and colors into a vertex buffer object
-	generateObjectBuffer(vertices, colors);
+	// Load 3D Model from a seperate file
+	ourModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
 
-	// Link the current buffer to the shader
-	linkCurrentBuffertoShader(shaderProgramID);
+	// translate it down so it's at the center of the scene
+	model = glm::translate(model, translateVector);
+
+	// scale the model to fit the viewports
+	model = glm::scale(model, scaleVector);
+
 }
 
 void init()
