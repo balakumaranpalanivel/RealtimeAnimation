@@ -10,6 +10,15 @@ CMesh::CMesh(std::vector<CVertex> vertices,
 	this->vIndices = indices;
 	this->vTextures = textures;
 
+	mTranslate = glm::vec3(0.0f, 0.0f, 0.0f);
+	mScale = glm::vec3(0.2f, 0.2f, 0.2f);
+
+	// translate it down so it's at the center of the scene
+	mModel = glm::translate(mModel, mTranslate);
+
+	// scale the model to fit the viewports
+	mModel = glm::scale(mModel, mScale);
+
 	SetupMesh();
 }
 
@@ -87,6 +96,8 @@ void CMesh::Draw(CShader shader)
 
 	// draw the mesh
 	glBindVertexArray(glnVAO);
+	// Set the model matrix here
+	shader.SetMat4("model", mModel);
 	glDrawElements(GL_TRIANGLES, vIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

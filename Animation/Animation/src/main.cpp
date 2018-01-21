@@ -16,13 +16,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "CShader.h"
 #include "CModel.h"
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-const unsigned int SCR_WIDTH = 1200;
+const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 float lastX = SCR_WIDTH / 2.0f;
@@ -37,7 +39,7 @@ int width = 800.0;
 int height = 600.0;
 
 // Camera
-glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH/2) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
+glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -45,7 +47,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
 
-glm::vec3 translateVector = glm::vec3(0.0f, -1.75f, 0.0f);
+glm::vec3 translateVector = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 scaleVector = glm::vec3(0.2f, 0.2f, 0.2f);
 
 glm::mat4 model;
@@ -218,25 +220,25 @@ void display()
 	ourShader.Use();
 
 	// Perspective projection viewport
-	glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
+	//glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
 	ourShader.SetMat4("projection", projection);
 	ourShader.SetMat4("view", view);
-	ourShader.SetMat4("model", model);
+	//ourShader.SetMat4("model", model);
 	ourShader.SetVec3("viewPos", cameraPos);
 	ourModel.Draw(ourShader);
 
-	// Orthographic projection viewport
-	glViewport(SCR_WIDTH / 2, 0, SCR_WIDTH / 2, SCR_HEIGHT);
-	orthoProjection = glm::ortho<float>(-2.0f, 2.0f, -2.0f, 2.0f, -200.0f, 200.0f);
-	ourShader.SetMat4("projection", orthoProjection);
-	orthoView = glm::lookAt(
-		glm::vec3(1.0f, 1.5f, 1.5f),
-		glm::vec3(0, 0, 0),
-		cameraUp);
-	ourShader.SetMat4("view", orthoView);
-	ourShader.SetMat4("model", model);
-	ourShader.SetVec3("viewPos", cameraPos);
-	ourModel.Draw(ourShader);
+	//// Orthographic projection viewport
+	//glViewport(SCR_WIDTH / 2, 0, SCR_WIDTH / 2, SCR_HEIGHT);
+	//orthoProjection = glm::ortho<float>(-2.0f, 2.0f, -2.0f, 2.0f, -200.0f, 200.0f);
+	//ourShader.SetMat4("projection", orthoProjection);
+	//orthoView = glm::lookAt(
+	//	glm::vec3(1.0f, 1.5f, 1.5f),
+	//	glm::vec3(0, 0, 0),
+	//	cameraUp);
+	//ourShader.SetMat4("view", orthoView);
+	//ourShader.SetMat4("model", model);
+	//ourShader.SetVec3("viewPos", cameraPos);
+	//ourModel.Draw(ourShader);
 }
 
 GLFWwindow* window;
@@ -268,7 +270,8 @@ void initScene()
 		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
 
 	// Load 3D Model from a seperate file
-	ourModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
+	ourModel.LoadModel("../Assets/Models/helicopter/helicopter.obj");
+	//ourModel.LoadModel("../Assets/Models/BB8/BB8.obj");
 
 	// translate it down so it's at the center of the scene
 	model = glm::translate(model, translateVector);
@@ -295,10 +298,10 @@ void init()
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(width, height, "Raytracer Compute Shader", NULL, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Raytracer Compute Shader", NULL, NULL);
 
 	videMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	glfwSetWindowPos(window, (videMode->width - width)/2, (videMode->height - height)/2);
+	glfwSetWindowPos(window, (videMode->width - SCR_WIDTH)/2, (videMode->height - SCR_HEIGHT)/2);
 	glfwMakeContextCurrent(window);
 
 	// Initialize GLEW
@@ -321,6 +324,21 @@ void loop()
 	{
 		glfwPollEvents();
 		glViewport(0, 0, width, height);
+		curr_time = timeGetTime();
+		delta = (curr_time - last_time);
+		if (delta > 16.0f)
+		{
+			// Update the view matrix to move the camera based on user input
+			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+			glm::vec3 eulerAngles(0.01f, 0.01f, 0.01f);
+			glm::quat MyQuaternion = glm::quat(eulerAngles);
+
+			// Constantly rotate the model about the Y axis
+			//model = glm::rotate<float>(model, 0.01, glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::toMat4(MyQuaternion) * model;
+			last_time = curr_time;
+		}
 		display();
 		glfwSwapBuffers(window);
 	}

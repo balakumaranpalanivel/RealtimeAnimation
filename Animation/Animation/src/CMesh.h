@@ -16,6 +16,10 @@ public:
 	std::vector<GLuint>			vIndices;
 	std::vector<CTexture>		vTextures;
 
+	glm::vec3					mTranslate;
+	glm::vec3					mScale;
+	glm::mat4					mModel;
+
 	CMesh(std::vector<CVertex> vertices,
 			std::vector<GLuint> indices,
 			std::vector<CTexture> textures);
