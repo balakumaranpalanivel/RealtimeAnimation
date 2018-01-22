@@ -136,6 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CMesh.cpp" />
     <ClCompile Include="src\CModel.cpp" />
     <ClCompile Include="src\CShader.cpp" />
@@ -152,6 +153,7 @@
     <None Include="src\shaders\diffuse.vs" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CMesh.h" />
     <ClInclude Include="src\CModel.h" />
     <ClInclude Include="src\CShader.h" />

@@ -21,6 +21,7 @@
 
 #include "CShader.h"
 #include "CModel.h"
+#include "Camera.h"
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -40,13 +41,13 @@ int width = 800.0;
 int height = 600.0;
 
 // Camera
-glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
-
-glm::vec3 cameraPos = glm::vec3(0.0f, 1.5f, 5.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
+//glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
+//
+//glm::vec3 cameraPos = glm::vec3(0.0f, 1.5f, 5.0f);
+//glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+//glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+//
+//glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
 
 glm::vec3 translateVector = glm::vec3(0.0f, -10.0f, 0.0f);
 glm::vec3 scaleVector = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -213,6 +214,10 @@ void linkCurrentBuffertoShader(GLuint shaderProgramID) {
 float rotate_y_top_rotor = 0.0f,
 	rotate_z_left_rotor = 0.0f;
 
+GLFWwindow* window;
+const GLFWvidmode* videMode;
+Camera primaryCamera;
+
 void display()
 {
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
@@ -224,16 +229,17 @@ void display()
 
 	// Perspective projection viewport
 	//glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
-	ourShader.SetMat4("projection", projection);
-	ourShader.SetMat4("view", view);
-	ourShader.SetVec3("viewPos", cameraPos);
+	primaryCamera.ComputeProjectViewFromInputs();
+	ourShader.SetMat4("projection", primaryCamera.mProjection);
+	ourShader.SetMat4("view", primaryCamera.mView);
+	ourShader.SetVec3("viewPos", primaryCamera.mCameraPosition);
 
 	glm::mat4 global1 = glm::mat4();
 
 	// Body
 	glm::mat4 localBody = glm::mat4();
 	localBody = glm::scale(localBody, scaleVector);
-	localBody = glm::rotate(localBody, 90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	localBody = glm::rotate(localBody, rotate_y_top_rotor*0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 globalBody = global1 * localBody;
 	ourShader.SetMat4("model", globalBody);
 	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -252,7 +258,7 @@ void display()
 	// Tail Rotor Left
 	glm::mat4 localTailLeftRotor = glm::mat4();
 	// translate
-	localTailLeftRotor = glm::translate(localTailLeftRotor, glm::vec3(5.0f, 0.0f, 5.0f));
+	localTailLeftRotor = glm::translate(localTailLeftRotor, glm::vec3(-0.05f, 2.87f, 5.5f));
 	// rotation
 	localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 globalTailLeftRotor = globalBody * localTailLeftRotor;
@@ -262,7 +268,7 @@ void display()
 
 	// Tail Rotor Right
 	glm::mat4 localTailRightRotor = glm::mat4();
-	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(5.0f, 0.0f, 5.0f));
+	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(0.05f, 2.87f, 5.5f));
 	localTailRightRotor = glm::rotate(localTailRightRotor, -rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 globalTailRightRotor = globalBody * localTailRightRotor;
 	ourShader.SetMat4("model", globalTailRightRotor);
@@ -312,9 +318,6 @@ void display()
 	//ourShader.SetVec3("viewPos", cameraPos);
 	//ourModel.Draw(ourShader);
 }
-
-GLFWwindow* window;
-const GLFWvidmode* videMode;
 
 void initScene()
 {
@@ -380,6 +383,9 @@ void init()
 	glfwSetWindowPos(window, (videMode->width - SCR_WIDTH)/2, (videMode->height - SCR_HEIGHT)/2);
 	glfwMakeContextCurrent(window);
 
+	primaryCamera.mWindow = window;
+	primaryCamera.SetMouseCallBack();
+
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK) {
@@ -408,7 +414,10 @@ void loop()
 			rotate_z_left_rotor += 0.1f;
 
 			// Update the view matrix to move the camera based on user input
-			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+			primaryCamera.mView = glm::lookAt(
+				primaryCamera.mCameraPosition,
+				primaryCamera.mCameraPosition + primaryCamera.mCameraFront,
+				primaryCamera.mCameraUp);
 
 			glm::vec3 eulerAngles(0.01f, 0.01f, 0.01f);
 			glm::quat MyQuaternion = glm::quat(eulerAngles);
