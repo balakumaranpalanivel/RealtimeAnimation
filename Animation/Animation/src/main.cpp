@@ -219,7 +219,7 @@ const GLFWvidmode* videMode;
 Camera primaryCamera;
 
 glm::mat4 bodyRotate = glm::mat4();
-glm::mat4 localBody = glm::mat4(); 
+glm::mat4 localBody = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
 
 void display()
 {
@@ -251,8 +251,8 @@ void display()
 	// Top Rotor
 	glm::mat4 localTopRotor = glm::mat4();
 	//localTopRotor = glm::scale(localTopRotor, scaleVector);
+	localTopRotor = glm::translate(localTopRotor, glm::vec3(0.0f, 0.8f, -0.9f));
 	localTopRotor = glm::rotate(localTopRotor, rotate_y_top_rotor, glm::vec3(0.0f, 1.0f, 0.0f));
-	localTopRotor = glm::translate(localTopRotor, glm::vec3(0.0f, 0.10f, 0.0f));
 	glm::mat4 globalTopRotor = globalBody * localTopRotor;
 	ourShader.SetMat4("model", globalTopRotor);
 	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
@@ -261,7 +261,7 @@ void display()
 	// Tail Rotor Left
 	glm::mat4 localTailLeftRotor = glm::mat4();
 	// translate
-	localTailLeftRotor = glm::translate(localTailLeftRotor, glm::vec3(-0.05f, 2.87f, 5.5f));
+	localTailLeftRotor = glm::translate(localTailLeftRotor, glm::vec3(-0.05f, -0.25f, 4.5f));
 	// rotation
 	localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 globalTailLeftRotor = globalBody * localTailLeftRotor;
@@ -271,7 +271,7 @@ void display()
 
 	// Tail Rotor Right
 	glm::mat4 localTailRightRotor = glm::mat4();
-	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(0.05f, 2.87f, 5.5f));
+	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(0.05f, -0.25f, 4.5f));
 	localTailRightRotor = glm::rotate(localTailRightRotor, -rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 globalTailRightRotor = globalBody * localTailRightRotor;
 	ourShader.SetMat4("model", globalTailRightRotor);
@@ -348,12 +348,11 @@ void initScene()
 		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
 
 	// Load 3D Model from a seperate file
-	ourModel.LoadModel("../Assets/Models/helicopter/helicopter.obj");
-	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor.obj");
+	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor_local.obj");
 	modelMachineGun.LoadModel("../Assets/Models/helicopter/helicopter_machine_gun.obj");
 	modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
 	modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
-	modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body.obj");
+	modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body_local.obj");
 
 	// translate it down so it's at the center of the scene
 	model = glm::translate(model, translateVector);
@@ -416,6 +415,13 @@ void ProcessInputs()
 		localBody = glm::toMat4(MyQuaternion) * localBody;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	{
+		eulerAngles = glm::vec3(-deltaAngle, 0.0f, 0.0f);
+		MyQuaternion = glm::quat(eulerAngles);
+		localBody = glm::toMat4(MyQuaternion) * localBody;
+	}
+
 	// yaw
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
@@ -424,9 +430,23 @@ void ProcessInputs()
 		localBody = glm::toMat4(MyQuaternion) * localBody;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+	{
+		eulerAngles = glm::vec3(0.0f, -deltaAngle, 0.0f);
+		MyQuaternion = glm::quat(eulerAngles);
+		localBody = glm::toMat4(MyQuaternion) * localBody;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
 		eulerAngles = glm::vec3(0.0f, 0.0f, deltaAngle);
+		MyQuaternion = glm::quat(eulerAngles);
+		localBody = glm::toMat4(MyQuaternion) * localBody;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		eulerAngles = glm::vec3(0.0f, 0.0f, -deltaAngle);
 		MyQuaternion = glm::quat(eulerAngles);
 		localBody = glm::toMat4(MyQuaternion) * localBody;
 	}
