@@ -42,7 +42,7 @@ int height = 600.0;
 // Camera
 glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 1.5f, 4.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 1.5f, 5.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -237,7 +237,7 @@ void display()
 	glm::mat4 globalBody = global1 * localBody;
 	ourShader.SetMat4("model", globalBody);
 	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	//modelBody.Draw(ourShader);
+	modelBody.Draw(ourShader);
 
 	// Top Rotor
 	glm::mat4 localTopRotor = glm::mat4();
@@ -247,24 +247,27 @@ void display()
 	glm::mat4 globalTopRotor = globalBody * localTopRotor;
 	ourShader.SetMat4("model", globalTopRotor);
 	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	//modelTopRotor.Draw(ourShader);
+	modelTopRotor.Draw(ourShader);
 
 	// Tail Rotor Left
 	glm::mat4 localTailLeftRotor = glm::mat4();
-
-	// rotation
-	glm::mat4 localTailLeftRotor_rotation = glm::mat4();
-	localTailLeftRotor_rotation = glm::rotate(localTailLeftRotor_rotation, rotate_z_left_rotor, glm::vec3(0.0f, 0.0f, 1.0f));
-
-	//localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	// translate
-	glm::mat4 localTailLeftRotor_translate = glm::translate(localTailLeftRotor, glm::vec3(0.0f, 0.0f, 0.0f));
-	localTailLeftRotor = localTailLeftRotor_translate;
-
-	glm::mat4 globalTailLeftRotor = localTailLeftRotor;
+	localTailLeftRotor = glm::translate(localTailLeftRotor, glm::vec3(5.0f, 0.0f, 5.0f));
+	// rotation
+	localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 globalTailLeftRotor = globalBody * localTailLeftRotor;
 	ourShader.SetMat4("model", globalTailLeftRotor);
 	ourShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
 	modelLeftTail.Draw(ourShader);
+
+	// Tail Rotor Right
+	glm::mat4 localTailRightRotor = glm::mat4();
+	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(5.0f, 0.0f, 5.0f));
+	localTailRightRotor = glm::rotate(localTailRightRotor, -rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 globalTailRightRotor = globalBody * localTailRightRotor;
+	ourShader.SetMat4("model", globalTailRightRotor);
+	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	modelRightTail.Draw(ourShader);
 
 	//ourShader.SetMat4("model", model);
 	//ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -342,8 +345,8 @@ void initScene()
 	ourModel.LoadModel("../Assets/Models/helicopter/helicopter.obj");
 	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor.obj");
 	modelMachineGun.LoadModel("../Assets/Models/helicopter/helicopter_machine_gun.obj");
-	modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin.obj");
-	modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_right_tail_spin.obj");
+	modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
+	modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
 	modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body.obj");
 
 	// translate it down so it's at the center of the scene
