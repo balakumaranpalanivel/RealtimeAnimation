@@ -218,6 +218,9 @@ GLFWwindow* window;
 const GLFWvidmode* videMode;
 Camera primaryCamera;
 
+glm::mat4 bodyRotate = glm::mat4();
+glm::mat4 localBody = glm::mat4(); 
+
 void display()
 {
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
@@ -229,7 +232,6 @@ void display()
 
 	// Perspective projection viewport
 	//glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
-	primaryCamera.ComputeProjectViewFromInputs();
 	ourShader.SetMat4("projection", primaryCamera.mProjection);
 	ourShader.SetMat4("view", primaryCamera.mView);
 	ourShader.SetVec3("viewPos", primaryCamera.mCameraPosition);
@@ -237,9 +239,10 @@ void display()
 	glm::mat4 global1 = glm::mat4();
 
 	// Body
-	glm::mat4 localBody = glm::mat4();
-	localBody = glm::scale(localBody, scaleVector);
-	localBody = glm::rotate(localBody, rotate_y_top_rotor*0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
+	//localBody = glm::mat4();
+	//localBody = glm::scale(localBody, scaleVector);
+	//localBody = glm::rotate(localBody, rotate_y_top_rotor*0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
+	//localBody = bodyRotate * localBody;
 	glm::mat4 globalBody = global1 * localBody;
 	ourShader.SetMat4("model", globalBody);
 	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -400,11 +403,45 @@ void init()
 
 }
 
+void ProcessInputs()
+{
+	float deltaAngle = 0.01f;
+	glm::vec3 eulerAngles;
+	glm::quat MyQuaternion;
+
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+	{
+		eulerAngles = glm::vec3(deltaAngle, 0.0f, 0.0f);
+		MyQuaternion = glm::quat(eulerAngles);
+		localBody = glm::toMat4(MyQuaternion) * localBody;
+	}
+
+	// yaw
+	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+	{
+		eulerAngles = glm::vec3(0.0f, deltaAngle, 0.0f);
+		MyQuaternion = glm::quat(eulerAngles);
+		localBody = glm::toMat4(MyQuaternion) * localBody;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+	{
+		eulerAngles = glm::vec3(0.0f, 0.0f, deltaAngle);
+		MyQuaternion = glm::quat(eulerAngles);
+		localBody = glm::toMat4(MyQuaternion) * localBody;
+	}
+}
+
 void loop()
 {
 	while (glfwWindowShouldClose(window) == GL_FALSE)
 	{
 		glfwPollEvents();
+		
+		primaryCamera.ComputeProjectViewFromInputs();
+
+		ProcessInputs();
+
 		glViewport(0, 0, width, height);
 		curr_time = timeGetTime();
 		delta = (curr_time - last_time);
