@@ -33,7 +33,8 @@ float lastY = SCR_HEIGHT / 2.0f;
 using namespace std;
 
 CShader ourShader;
-CModel ourModel;
+CModel ourModel, modelTopRotor, modelMachineGun,
+		modelLeftTail, modelRightTail, modelBody;
 
 int width = 800.0;
 int height = 600.0;
@@ -41,14 +42,14 @@ int height = 600.0;
 // Camera
 glm::mat4 projection = glm::perspective<float>(45.0, ((float)(SCR_WIDTH) / (float)(SCR_HEIGHT)), 0.1f, 100.0f);
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 1.5f, 4.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 glm::mat4 view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
 
-glm::vec3 translateVector = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 scaleVector = glm::vec3(0.2f, 0.2f, 0.2f);
+glm::vec3 translateVector = glm::vec3(0.0f, -10.0f, 0.0f);
+glm::vec3 scaleVector = glm::vec3(0.5f, 0.5f, 0.5f);
 
 glm::mat4 model;
 glm::mat4 orthoProjection;
@@ -209,6 +210,8 @@ void linkCurrentBuffertoShader(GLuint shaderProgramID) {
 
 #pragma endregion VBO_FUNCTIONS
 
+float rotate_y_top_rotor = 0.0f,
+	rotate_z_left_rotor = 0.0f;
 
 void display()
 {
@@ -223,9 +226,75 @@ void display()
 	//glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
 	ourShader.SetMat4("projection", projection);
 	ourShader.SetMat4("view", view);
-	//ourShader.SetMat4("model", model);
 	ourShader.SetVec3("viewPos", cameraPos);
-	ourModel.Draw(ourShader);
+
+	glm::mat4 global1 = glm::mat4();
+
+	// Body
+	glm::mat4 localBody = glm::mat4();
+	localBody = glm::scale(localBody, scaleVector);
+	localBody = glm::rotate(localBody, 90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 globalBody = global1 * localBody;
+	ourShader.SetMat4("model", globalBody);
+	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	//modelBody.Draw(ourShader);
+
+	// Top Rotor
+	glm::mat4 localTopRotor = glm::mat4();
+	//localTopRotor = glm::scale(localTopRotor, scaleVector);
+	localTopRotor = glm::rotate(localTopRotor, rotate_y_top_rotor, glm::vec3(0.0f, 1.0f, 0.0f));
+	localTopRotor = glm::translate(localTopRotor, glm::vec3(0.0f, 0.10f, 0.0f));
+	glm::mat4 globalTopRotor = globalBody * localTopRotor;
+	ourShader.SetMat4("model", globalTopRotor);
+	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	//modelTopRotor.Draw(ourShader);
+
+	// Tail Rotor Left
+	glm::mat4 localTailLeftRotor = glm::mat4();
+
+	// rotation
+	glm::mat4 localTailLeftRotor_rotation = glm::mat4();
+	localTailLeftRotor_rotation = glm::rotate(localTailLeftRotor_rotation, rotate_z_left_rotor, glm::vec3(0.0f, 0.0f, 1.0f));
+
+	//localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
+	// translate
+	glm::mat4 localTailLeftRotor_translate = glm::translate(localTailLeftRotor, glm::vec3(0.0f, 0.0f, 0.0f));
+	localTailLeftRotor = localTailLeftRotor_translate;
+
+	glm::mat4 globalTailLeftRotor = localTailLeftRotor;
+	ourShader.SetMat4("model", globalTailLeftRotor);
+	ourShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	modelLeftTail.Draw(ourShader);
+
+	//ourShader.SetMat4("model", model);
+	//ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	//ourModel.Draw(ourShader);
+
+	//glm::mat4 model1 = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+	//ourShader.SetMat4("model", model1);
+	//ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	//modelTopRotor.Draw(ourShader);
+
+	//glm::mat4 model2 = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+	//ourShader.SetMat4("model", model2);
+	//ourShader.SetVec3("aFragColor", glm::vec3(0.0f, 1.0f, 0.0f));
+	//modelMachineGun.Draw(ourShader);
+
+	//glm::mat4 model3 = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+	//ourShader.SetMat4("model", model3);
+	//ourShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	//modelLeftTail.Draw(ourShader);
+
+	//glm::mat4 model4 = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+	//ourShader.SetMat4("model", model4);
+	//ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	//modelRightTail.Draw(ourShader);
+
+	//glm::mat4 model5 = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+	//ourShader.SetMat4("model", model5);
+	//ourShader.SetVec3("aFragColor", glm::vec3(0.0f, 1.0f, 1.0f));
+	//modelBody.Draw(ourShader);
+
 
 	//// Orthographic projection viewport
 	//glViewport(SCR_WIDTH / 2, 0, SCR_WIDTH / 2, SCR_HEIGHT);
@@ -271,7 +340,11 @@ void initScene()
 
 	// Load 3D Model from a seperate file
 	ourModel.LoadModel("../Assets/Models/helicopter/helicopter.obj");
-	//ourModel.LoadModel("../Assets/Models/BB8/BB8.obj");
+	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor.obj");
+	modelMachineGun.LoadModel("../Assets/Models/helicopter/helicopter_machine_gun.obj");
+	modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin.obj");
+	modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_right_tail_spin.obj");
+	modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body.obj");
 
 	// translate it down so it's at the center of the scene
 	model = glm::translate(model, translateVector);
@@ -328,6 +401,9 @@ void loop()
 		delta = (curr_time - last_time);
 		if (delta > 16.0f)
 		{
+			rotate_y_top_rotor += 0.7f;
+			rotate_z_left_rotor += 0.1f;
+
 			// Update the view matrix to move the camera based on user input
 			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
@@ -336,7 +412,7 @@ void loop()
 
 			// Constantly rotate the model about the Y axis
 			//model = glm::rotate<float>(model, 0.01, glm::vec3(0.0f, 1.0f, 0.0f));
-			model = glm::toMat4(MyQuaternion) * model;
+			//model = glm::toMat4(MyQuaternion) * model;
 			last_time = curr_time;
 		}
 		display();

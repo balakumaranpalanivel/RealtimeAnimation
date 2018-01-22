@@ -97,7 +97,7 @@ void CMesh::Draw(CShader shader)
 	// draw the mesh
 	glBindVertexArray(glnVAO);
 	// Set the model matrix here
-	shader.SetMat4("model", mModel);
+	//shader.SetMat4("model", mModel);
 	glDrawElements(GL_TRIANGLES, vIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

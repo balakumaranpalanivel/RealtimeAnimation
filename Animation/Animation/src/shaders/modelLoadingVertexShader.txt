@@ -7,11 +7,13 @@ out vec2 TexCoords;
 out vec3 ANormal;
 out vec3 FragPos;
 out vec3 ViewPos;
+out vec3 vFragColor;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 viewPos;
+uniform vec3 aFragColor;
 
 void main()
 {
@@ -20,5 +22,6 @@ void main()
 	FragPos = vec3(model*vec4(aPos, 1.0));
 	ViewPos = viewPos;
 
+	vFragColor = aFragColor;
     gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
