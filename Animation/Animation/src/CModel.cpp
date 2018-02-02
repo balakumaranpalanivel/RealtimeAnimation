@@ -144,6 +144,9 @@ std::vector<CTexture> CModel::LoadMaterialTextures(aiMaterial *material, aiTextu
 			vTexturesLoaded.push_back(texture);
 		}
 	}
+	
+	aiColor4D diffuse;
+	aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
 
 	return textures;
 }

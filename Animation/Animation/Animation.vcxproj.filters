@@ -30,9 +30,6 @@
     <ClCompile Include="src\CShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\shaders\simpleFragmentShader.txt">

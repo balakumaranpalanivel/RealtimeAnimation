@@ -136,7 +136,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CMesh.cpp" />
     <ClCompile Include="src\CModel.cpp" />
     <ClCompile Include="src\CShader.cpp" />

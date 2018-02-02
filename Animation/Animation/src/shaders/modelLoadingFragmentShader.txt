@@ -40,6 +40,6 @@ void main()
 	// END - Specular Effect
 
 	// Compute the final color combining all the components
-	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f)) * vec4(vFragColor, 1.0f);// * texture(texture_diffuse1, TexCoords);
+	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f);
 	//FragColor = vec4(vFragColor, 1.0f);
 }
