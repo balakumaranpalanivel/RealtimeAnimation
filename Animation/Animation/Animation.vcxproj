@@ -158,6 +158,7 @@
     <ClInclude Include="src\CShader.h" />
     <ClInclude Include="src\CTexture.h" />
     <ClInclude Include="src\CVertex.h" />
+    <ClInclude Include="src\Object3D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

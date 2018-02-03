@@ -22,6 +22,7 @@
 #include "CShader.h" 
 #include "CModel.h"
 #include "Camera.h"
+#include "Object3D.h"
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -35,6 +36,8 @@ CShader simpleShader;
 
 CModel ourModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
+Object3D bodyTransform,
+	topRotorTransform;
 
 glm::vec3 translateVector = glm::vec3(0.0f, -10.0f, 0.0f);
 glm::vec3 scaleVector = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -162,7 +165,6 @@ void display()
 	modelShader.SetMat4("view", newCamera.GetViewMatrix());
 	modelShader.SetVec3("viewPos", newCamera.GetPosition());
 
-	glm::mat4 world = glm::mat4();
 	glm::mat4 global1 = glm::mat4();
 
 	//localBody = glm::mat4();
@@ -170,7 +172,8 @@ void display()
 	//localBody = glm::rotate(localBody, rotate_y_top_rotor*0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
 	//localBody = bodyRotate * localBody;
 	// Body
-	glm::mat4 globalBody = global1 * localBody;
+	glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
+	
 	modelShader.SetMat4("model", globalBody);
 	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	modelBody.Draw(modelShader);
@@ -349,15 +352,21 @@ void ProcessInputs()
 	// move front
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 	{
-		localBody = glm::translate(localBody, glm::vec3(0.0f, 0.0f, 0.2f));
+		/*localBody = glm::translate(localBody, glm::vec3(0.0f, 0.0f, 0.2f));*/
+		bodyTransform.translateLocal(
+			glm::vec3(0.0f, 0.0f, 0.2f));
 	}
 
 	// Pitch
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 	{
-		eulerAngles = glm::vec3(deltaAngle, 0.0f, 0.0f);
+	/*	eulerAngles = glm::vec3(deltaAngle, 0.0f, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion) ;
+		localBody = localBody * glm::toMat4(MyQuaternion) ;*/
+
+		bodyTransform.rotateLocal(
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			deltaAngle);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
@@ -365,6 +374,8 @@ void ProcessInputs()
 		eulerAngles = glm::vec3(-deltaAngle, 0.0f, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
 		localBody = localBody * glm::toMat4(MyQuaternion);
+
+
 	}
 
 	// yaw
