@@ -17,8 +17,6 @@ void CModel::Draw(CShader shader)
 {
 	for (unsigned int i = 0; i < vMeshes.size(); i++)
 	{
-		// 
-
 		vMeshes[i].Draw(shader);
 	}
 }

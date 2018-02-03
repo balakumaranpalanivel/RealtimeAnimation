@@ -3,6 +3,9 @@
 // Libraries
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 
 // Class Object3D
@@ -54,6 +57,10 @@ public:
 	// Rotate the object in local-space
 	void rotateLocal(const glm::vec3& axis, float angle);
 
+	// Rotate the obejct in local-space using quat
+	void rotateLocalQuat(float rotateX,
+		float rotateY, float rotateZ);
+
 	//// Rotate around a world-space point
 	//void rotateAroundWorldPoint(const glm::vec3& axis, float angle, const glm::vec3& point);
 
@@ -102,7 +109,11 @@ inline void Object3D::rotateLocal(const glm::vec3& axis, float angle) {
 inline void Object3D::rotateLocalQuat(float rotateX,
 	float rotateY, float rotateZ)
 {
+	glm::vec3 eulerAngles = glm::vec3(rotateX, rotateY,
+		rotateZ);
+	glm::quat MyQuaternion = glm::quat(eulerAngles);
 
+	mTransformMatrix = mTransformMatrix * glm::toMat4(MyQuaternion);
 }
 
 //// Rotate the object around a world-space point

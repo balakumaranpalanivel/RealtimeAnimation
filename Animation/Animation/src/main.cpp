@@ -375,15 +375,16 @@ void ProcessInputs()
 		MyQuaternion = glm::quat(eulerAngles);
 		localBody = localBody * glm::toMat4(MyQuaternion);
 
-
 	}
 
 	// yaw
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
-		eulerAngles = glm::vec3(0.0f, deltaAngle, 0.0f);
+		/*eulerAngles = glm::vec3(0.0f, deltaAngle, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion);
+		localBody = localBody * glm::toMat4(MyQuaternion);*/
+		bodyTransform.rotateLocalQuat(0.0f,
+			deltaAngle, 0.0f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
