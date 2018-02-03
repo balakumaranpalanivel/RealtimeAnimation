@@ -360,54 +360,37 @@ void ProcessInputs()
 	// Pitch
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 	{
-	/*	eulerAngles = glm::vec3(deltaAngle, 0.0f, 0.0f);
-		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion) ;*/
-
-		bodyTransform.rotateLocal(
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			deltaAngle);
+		bodyTransform.rotateLocalQuat(deltaAngle, 0.0f, 0.0f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
-		eulerAngles = glm::vec3(-deltaAngle, 0.0f, 0.0f);
-		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion);
-
+		bodyTransform.rotateLocalQuat(-deltaAngle, 0.0f, 0.0f);
 	}
 
 	// yaw
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
-		/*eulerAngles = glm::vec3(0.0f, deltaAngle, 0.0f);
-		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion);*/
 		bodyTransform.rotateLocalQuat(0.0f,
 			deltaAngle, 0.0f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
-		eulerAngles = glm::vec3(0.0f, -deltaAngle, 0.0f);
-		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion);
+		bodyTransform.rotateLocalQuat(0.0f,
+			-deltaAngle, 0.0f);
 	}
 
 	// roll
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
-		eulerAngles = glm::vec3(0.0f, 0.0f, deltaAngle);
-		MyQuaternion = glm::quat(eulerAngles);
-		localBody = localBody * glm::toMat4(MyQuaternion);
+		bodyTransform.rotateLocalQuat(0.0f, 0.0f, deltaAngle);
 	}
 
-	//if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	//{
-	//	eulerAngles = glm::vec3(0.0f, 0.0f, -deltaAngle);
-	//	MyQuaternion = glm::quat(eulerAngles);
-	//	localBody = glm::toMat4(MyQuaternion) * localBody;
-	//}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		bodyTransform.rotateLocalQuat(0.0f, 0.0f, -deltaAngle);
+	}
 }
 
 
