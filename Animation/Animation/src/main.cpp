@@ -30,7 +30,9 @@ const unsigned int SCR_HEIGHT = 800;
 
 using namespace std;
 
-CShader ourShader;
+CShader modelShader;
+CShader simpleShader;
+
 CModel ourModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
 
@@ -61,6 +63,85 @@ glm::mat4 bodyRotate = glm::mat4();
 glm::mat4 localBody = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
 glm::mat4 projection;
 
+float grid_vertex_count = 0;
+float *grid_vertex_points;
+
+GLuint element_buffer_length = 0;
+GLuint *element_buffer;
+
+void drawGrid(int nHalfSize)
+{
+	grid_vertex_count = pow((nHalfSize * 2) + 1, 2);
+	grid_vertex_points = new float[grid_vertex_count * 3];
+	int j = 0;
+	for (float x = -nHalfSize; x <= nHalfSize; x++)
+	{
+		for (float y = -nHalfSize; y <= nHalfSize; y++)
+		{
+			grid_vertex_points[j++] = x;
+			grid_vertex_points[j++] = 0;
+			grid_vertex_points[j++] = y;
+		}
+	}
+
+	j = 0;
+	int vertices_in_row = ((nHalfSize * 2) + 1);
+	element_buffer_length = ((2 * pow(vertices_in_row, 2)) - (2 * vertices_in_row)) * 2;
+	element_buffer = new GLuint[element_buffer_length];
+	for (int i = 0; i <= (grid_vertex_count - vertices_in_row); i += vertices_in_row)
+	{
+		for (int k = i; k <= (i + vertices_in_row) - 1; k++)
+		{
+			if (k != (i + vertices_in_row) - 1)
+			{
+				// 0 to 1
+				element_buffer[j++] = k;
+				element_buffer[j++] = k + 1;
+			}
+
+			if (k + vertices_in_row < grid_vertex_count)
+			{
+				// 0 to 3
+				element_buffer[j++] = k;
+				element_buffer[j++] = k + vertices_in_row;
+			}
+		}
+	}
+}
+
+void generateObjectBufferTeapot() {
+	GLuint vp_vbo = 0;
+
+	GLuint loc1 = glGetAttribLocation(simpleShader.glnProgramID, "vertex_position");
+	//loc2 = glGetAttribLocation(shaderProgramID, "vertex_normals");
+
+	glGenBuffers(1, &vp_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vp_vbo);
+	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_vertex_points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * grid_vertex_count * sizeof(float), grid_vertex_points, GL_STATIC_DRAW);
+
+	//GLuint vn_vbo = 0;
+	//glGenBuffers (1, &vn_vbo);
+	//glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
+	//glBufferData (GL_ARRAY_BUFFER, 3 * teapot_vertex_count * sizeof (float), teapot_normals, GL_STATIC_DRAW);
+
+	//glGenVertexArrays(1, &teapot_vao);
+	//glBindVertexArray(teapot_vao);
+
+	glEnableVertexAttribArray(loc1);
+	glBindBuffer(GL_ARRAY_BUFFER, vp_vbo);
+	glVertexAttribPointer(loc1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	// Element buffer object
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, element_buffer_length * sizeof(GLuint), element_buffer, GL_STATIC_DRAW);
+	//glEnableVertexAttribArray (loc2);
+	//glBindBuffer (GL_ARRAY_BUFFER, vn_vbo);
+	//glVertexAttribPointer (loc2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+}
+
 void display()
 {
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
@@ -68,14 +149,20 @@ void display()
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	ourShader.Use();
-
 	projection = glm::perspective(newCamera.GetZoom(), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 100.0f);
 
-	ourShader.SetMat4("projection", projection);
-	ourShader.SetMat4("view", newCamera.GetViewMatrix());
-	ourShader.SetVec3("viewPos", newCamera.GetPosition());
+	simpleShader.Use();
+	simpleShader.SetMat4("proj", projection);
+	simpleShader.SetMat4("view", newCamera.GetViewMatrix());
+	simpleShader.SetMat4("model", glm::mat4());
+	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
+	modelShader.Use();
+	modelShader.SetMat4("projection", projection);
+	modelShader.SetMat4("view", newCamera.GetViewMatrix());
+	modelShader.SetVec3("viewPos", newCamera.GetPosition());
+
+	glm::mat4 world = glm::mat4();
 	glm::mat4 global1 = glm::mat4();
 
 	//localBody = glm::mat4();
@@ -84,9 +171,9 @@ void display()
 	//localBody = bodyRotate * localBody;
 	// Body
 	glm::mat4 globalBody = global1 * localBody;
-	ourShader.SetMat4("model", globalBody);
-	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	modelBody.Draw(ourShader);
+	modelShader.SetMat4("model", globalBody);
+	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	modelBody.Draw(modelShader);
 
 	// Top Rotor
 	glm::mat4 localTopRotor = glm::mat4();
@@ -94,9 +181,9 @@ void display()
 	localTopRotor = glm::translate(localTopRotor, glm::vec3(0.0f, 0.8f, -0.9f));
 	localTopRotor = glm::rotate(localTopRotor, rotate_y_top_rotor, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 globalTopRotor = globalBody * localTopRotor;
-	ourShader.SetMat4("model", globalTopRotor);
-	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	modelTopRotor.Draw(ourShader);
+	modelShader.SetMat4("model", globalTopRotor);
+	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	modelTopRotor.Draw(modelShader);
 
 	// Tail Rotor Left
 	glm::mat4 localTailLeftRotor = glm::mat4();
@@ -105,26 +192,28 @@ void display()
 	// rotation
 	localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 globalTailLeftRotor = globalBody * localTailLeftRotor;
-	ourShader.SetMat4("model", globalTailLeftRotor);
-	ourShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	modelLeftTail.Draw(ourShader);
+	modelShader.SetMat4("model", globalTailLeftRotor);
+	modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	modelLeftTail.Draw(modelShader);
 
 	// Tail Rotor Right
 	glm::mat4 localTailRightRotor = glm::mat4();
 	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(0.05f, -0.25f, 4.5f));
 	localTailRightRotor = glm::rotate(localTailRightRotor, -rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 globalTailRightRotor = globalBody * localTailRightRotor;
-	ourShader.SetMat4("model", globalTailRightRotor);
-	ourShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
-	modelRightTail.Draw(ourShader);
+	modelShader.SetMat4("model", globalTailRightRotor);
+	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	modelRightTail.Draw(modelShader);
 }
 
 void initScene()
 {
 
 	// Set up the shaders
-	ourShader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
+	modelShader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
 		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
+	simpleShader.LoadShaders("../Animation/src/shaders/simpleVertexShader.txt",
+		"../Animation/src/shaders/simpleFragmentShader.txt");
 
 	// Load 3D Model from a seperate file
 	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor_local.obj");
@@ -138,6 +227,8 @@ void initScene()
 
 	// scale the model to fit the viewports
 	model = glm::scale(model, scaleVector);
+
+	generateObjectBufferTeapot();
 
 }
 
@@ -255,19 +346,25 @@ void ProcessInputs()
 	glm::vec3 eulerAngles;
 	glm::quat MyQuaternion;
 
+	// move front
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+	{
+		localBody = glm::translate(localBody, glm::vec3(0.0f, 0.0f, 0.2f));
+	}
+
 	// Pitch
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 	{
 		eulerAngles = glm::vec3(deltaAngle, 0.0f, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = glm::toMat4(MyQuaternion) * localBody;
+		localBody = localBody * glm::toMat4(MyQuaternion) ;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
 		eulerAngles = glm::vec3(-deltaAngle, 0.0f, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = glm::toMat4(MyQuaternion) * localBody;
+		localBody = localBody * glm::toMat4(MyQuaternion);
 	}
 
 	// yaw
@@ -275,14 +372,14 @@ void ProcessInputs()
 	{
 		eulerAngles = glm::vec3(0.0f, deltaAngle, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = glm::toMat4(MyQuaternion) * localBody;
+		localBody = localBody * glm::toMat4(MyQuaternion);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
 		eulerAngles = glm::vec3(0.0f, -deltaAngle, 0.0f);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = glm::toMat4(MyQuaternion) * localBody;
+		localBody = localBody * glm::toMat4(MyQuaternion);
 	}
 
 	// roll
@@ -290,7 +387,7 @@ void ProcessInputs()
 	{
 		eulerAngles = glm::vec3(0.0f, 0.0f, deltaAngle);
 		MyQuaternion = glm::quat(eulerAngles);
-		localBody = glm::toMat4(MyQuaternion) * localBody;
+		localBody = localBody * glm::toMat4(MyQuaternion);
 	}
 
 	//if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
@@ -334,6 +431,9 @@ void loop()
 
 int main(int argc, char** argv){
 	
+	//call it like this
+	drawGrid(10);
+
 	init();
 
 	loop();
