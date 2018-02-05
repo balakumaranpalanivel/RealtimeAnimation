@@ -273,22 +273,22 @@ void MouseCallback(GLFWwindow *window, double xPos, double yPos)
 void DoMovement()
 {
 	// Camera controls
-	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
+	if (keys[GLFW_KEY_W])
 	{
 		newCamera.ProcessKeyboard(FORWARD, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
+	if (keys[GLFW_KEY_S])
 	{
 		newCamera.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
+	if (keys[GLFW_KEY_A])
 	{
 		newCamera.ProcessKeyboard(LEFT, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
+	if (keys[GLFW_KEY_D])
 	{
 		newCamera.ProcessKeyboard(RIGHT, deltaTime);
 	}
@@ -341,9 +341,15 @@ void ProcessInputs()
 	glm::quat MyQuaternion;
 
 	// move front
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		/*localBody = glm::translate(localBody, glm::vec3(0.0f, 0.0f, 0.2f));*/
+		bodyTransform.translateLocal(
+			glm::vec3(0.0f, 0.0f, -0.2f));
+	}
+
+	// move back
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
 		bodyTransform.translateLocal(
 			glm::vec3(0.0f, 0.0f, 0.2f));
 	}
@@ -354,7 +360,7 @@ void ProcessInputs()
 		bodyTransform.rotateLocalQuat(deltaAngle, 0.0f, 0.0f);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalQuat(-deltaAngle, 0.0f, 0.0f);
 	}
@@ -366,7 +372,7 @@ void ProcessInputs()
 			deltaAngle, 0.0f);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalQuat(0.0f,
 			-deltaAngle, 0.0f);
@@ -378,7 +384,7 @@ void ProcessInputs()
 		bodyTransform.rotateLocalQuat(0.0f, 0.0f, deltaAngle);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalQuat(0.0f, 0.0f, -deltaAngle);
 	}
