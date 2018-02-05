@@ -181,44 +181,44 @@ void display()
 	glBindVertexArray(0);
 	glDepthMask(GL_TRUE);
 
-	//simpleShader.Use();
-	//simpleShader.SetMat4("proj", projection);
-	//simpleShader.SetMat4("view", newCamera.GetViewMatrix());
-	//simpleShader.SetMat4("model", glm::mat4());
-	//glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
+	simpleShader.Use();
+	simpleShader.SetMat4("proj", projection);
+	simpleShader.SetMat4("view", newCamera.GetViewMatrix());
+	simpleShader.SetMat4("model", glm::mat4());
+	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
-	//modelShader.Use();
-	//modelShader.SetMat4("projection", projection);
-	//modelShader.SetMat4("view", newCamera.GetViewMatrix());
-	//modelShader.SetVec3("viewPos", newCamera.GetPosition());
+	modelShader.Use();
+	modelShader.SetMat4("projection", projection);
+	modelShader.SetMat4("view", newCamera.GetViewMatrix());
+	modelShader.SetVec3("viewPos", newCamera.GetPosition());
 
-	//glm::mat4 global1 = glm::mat4();
+	glm::mat4 global1 = glm::mat4();
 
-	//glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
-	//modelShader.SetMat4("model", globalBody);
-	//modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	//modelBody.Draw(modelShader);
+	glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
+	modelShader.SetMat4("model", globalBody);
+	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	modelBody.Draw(modelShader);
 
-	//// Top Rotor
-	//topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
-	//glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
-	//modelShader.SetMat4("model", globalTopRotor);
-	//modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	//modelTopRotor.Draw(modelShader);
+	// Top Rotor
+	topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
+	glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
+	modelShader.SetMat4("model", globalTopRotor);
+	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	modelTopRotor.Draw(modelShader);
 
-	//// Tail Rotor Left
-	//tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
-	//glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
-	//modelShader.SetMat4("model", globalTailLeftRotor);
-	//modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	//modelLeftTail.Draw(modelShader);
+	// Tail Rotor Left
+	tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
+	glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
+	modelShader.SetMat4("model", globalTailLeftRotor);
+	modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	modelLeftTail.Draw(modelShader);
 
-	//// Tail Rotor Right
-	//tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
-	//glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
-	//modelShader.SetMat4("model", globalTailRightRotor);
-	//modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
-	//modelRightTail.Draw(modelShader);
+	// Tail Rotor Right
+	tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
+	glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
+	modelShader.SetMat4("model", globalTailRightRotor);
+	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	modelRightTail.Draw(modelShader);
 }
 
 void initScene()
