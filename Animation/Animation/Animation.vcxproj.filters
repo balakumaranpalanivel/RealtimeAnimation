@@ -44,6 +44,12 @@
     <Text Include="src\shaders\modelLoadingVertexShader.txt">
       <Filter>Shaders</Filter>
     </Text>
+    <Text Include="src\shaders\skyboxFragmentShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="src\shaders\skyboxVertexShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\diffuse.ps">

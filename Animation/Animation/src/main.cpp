@@ -35,6 +35,7 @@ using namespace std;
 
 CShader modelShader;
 CShader simpleShader;
+CShader skyBoxShader;
 
 CModel ourModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
@@ -75,6 +76,9 @@ float *grid_vertex_points;
 
 GLuint element_buffer_length = 0;
 GLuint *element_buffer;
+
+unsigned int skyboxVAO, skyboxVBO;
+unsigned int cubemapTexture;
 
 void drawGrid(int nHalfSize)
 {
@@ -149,53 +153,72 @@ void generateObjectBufferTeapot() {
 	//glVertexAttribPointer (loc2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
+void generateObjectBufferSkybox();
+
 void display()
 {
+
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// 
+	generateObjectBufferSkybox();
+
 	projection = glm::perspective(newCamera.GetZoom(), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 100.0f);
 
-	simpleShader.Use();
-	simpleShader.SetMat4("proj", projection);
-	simpleShader.SetMat4("view", newCamera.GetViewMatrix());
-	simpleShader.SetMat4("model", glm::mat4());
-	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
+	glDepthMask(GL_FALSE);
+	skyBoxShader.Use();
+	skyBoxShader.SetMat4("view", glm::mat4(glm::mat3(newCamera.GetViewMatrix())));
+	skyBoxShader.SetMat4("projection", projection);
 
-	modelShader.Use();
-	modelShader.SetMat4("projection", projection);
-	modelShader.SetMat4("view", newCamera.GetViewMatrix());
-	modelShader.SetVec3("viewPos", newCamera.GetPosition());
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthMask(GL_TRUE);
 
-	glm::mat4 global1 = glm::mat4();
+	//simpleShader.Use();
+	//simpleShader.SetMat4("proj", projection);
+	//simpleShader.SetMat4("view", newCamera.GetViewMatrix());
+	//simpleShader.SetMat4("model", glm::mat4());
+	//glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
-	glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalBody);
-	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	modelBody.Draw(modelShader);
+	//modelShader.Use();
+	//modelShader.SetMat4("projection", projection);
+	//modelShader.SetMat4("view", newCamera.GetViewMatrix());
+	//modelShader.SetVec3("viewPos", newCamera.GetPosition());
 
-	// Top Rotor
-	topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
-	glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalTopRotor);
-	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	modelTopRotor.Draw(modelShader);
+	//glm::mat4 global1 = glm::mat4();
 
-	// Tail Rotor Left
-	tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
-	glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalTailLeftRotor);
-	modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	modelLeftTail.Draw(modelShader);
+	//glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
+	//modelShader.SetMat4("model", globalBody);
+	//modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	//modelBody.Draw(modelShader);
 
-	// Tail Rotor Right
-	tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
-	glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalTailRightRotor);
-	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
-	modelRightTail.Draw(modelShader);
+	//// Top Rotor
+	//topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
+	//glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
+	//modelShader.SetMat4("model", globalTopRotor);
+	//modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	//modelTopRotor.Draw(modelShader);
+
+	//// Tail Rotor Left
+	//tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
+	//glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
+	//modelShader.SetMat4("model", globalTailLeftRotor);
+	//modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	//modelLeftTail.Draw(modelShader);
+
+	//// Tail Rotor Right
+	//tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
+	//glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
+	//modelShader.SetMat4("model", globalTailRightRotor);
+	//modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	//modelRightTail.Draw(modelShader);
 }
 
 void initScene()
@@ -206,6 +229,10 @@ void initScene()
 		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
 	simpleShader.LoadShaders("../Animation/src/shaders/simpleVertexShader.txt",
 		"../Animation/src/shaders/simpleFragmentShader.txt");
+
+	// Skybox shaders
+	skyBoxShader.LoadShaders("../Animation/src/shaders/skyboxVertexShader.txt",
+		"../Animation/src/shaders/skyboxFragmentShader.txt");
 
 	// Load 3D Model from a seperate file
 	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor_local.obj");
@@ -220,7 +247,7 @@ void initScene()
 	// scale the model to fit the viewports
 	model = glm::scale(model, scaleVector);
 
-	generateObjectBufferTeapot();
+	//generateObjectBufferTeapot();
 
 	topRotorTransform.translateLocal(glm::vec3(0.0f, 0.8f, -0.9f));
 	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
@@ -501,10 +528,126 @@ unsigned int loadCubemap(vector<std::string> faces)
 	return textureID;
 }
 
+void generateObjectBufferSkybox() {
+	// set up vertex data (and buffer(s)) and configure vertex attributes
+	// ------------------------------------------------------------------
+	float cubeVertices[] = {
+		// positions          // normals
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+
+	// cube VAO
+	unsigned int cubeVAO, cubeVBO;
+	glGenVertexArrays(1, &cubeVAO);
+	glGenBuffers(1, &cubeVBO);
+	glBindVertexArray(cubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	// skybox VAO
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+}
+
 int main(int argc, char** argv){
 	
 	//call it like this
 	drawGrid(10);
+
+	init();
 
 	// load textures
 	// -------------
@@ -517,9 +660,7 @@ int main(int argc, char** argv){
 		"../Animation/src/skybox/front.jpg",
 		"../Animation/src/skybox/back.jpg",
 	};
-	unsigned int cubemapTexture = loadCubemap(faces);
-
-	init();
+	cubemapTexture = loadCubemap(faces);
 
 	loop();
 
