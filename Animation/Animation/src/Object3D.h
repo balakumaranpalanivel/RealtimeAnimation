@@ -66,6 +66,8 @@ public:
 
 	//// Rotate around a local-space point
 	//void rotateAroundLocalPoint(const glm::vec3& axis, float angle, const glm::vec3& worldPoint);
+
+	//void SetChild(Object3D child);
 };
 
 // Return the transform matrix
@@ -133,5 +135,10 @@ inline void Object3D::rotateLocalQuat(float rotateX,
 //	mTransformMatrix = mTransformMatrix * Matrix4::translationMatrix(localPoint)
 //		* Matrix4::rotationMatrix(axis, angle)
 //		* Matrix4::translationMatrix(-localPoint);
+//}
+
+//void Object3D::SetChild(Object3D child)
+//{
+//
 //}
 

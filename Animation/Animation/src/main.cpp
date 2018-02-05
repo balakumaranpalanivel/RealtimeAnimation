@@ -37,7 +37,9 @@ CShader simpleShader;
 CModel ourModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
 Object3D bodyTransform,
-	topRotorTransform;
+	topRotorTransform,
+	tailLeftRotorTransform,
+	tailRightRotorTransform;
 
 glm::vec3 translateVector = glm::vec3(0.0f, -10.0f, 0.0f);
 glm::vec3 scaleVector = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -167,43 +169,28 @@ void display()
 
 	glm::mat4 global1 = glm::mat4();
 
-	//localBody = glm::mat4();
-	//localBody = glm::scale(localBody, scaleVector);
-	//localBody = glm::rotate(localBody, rotate_y_top_rotor*0.1f, glm::vec3(0.0f, 1.0f, 0.0f));
-	//localBody = bodyRotate * localBody;
-	// Body
 	glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
-	
 	modelShader.SetMat4("model", globalBody);
 	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	modelBody.Draw(modelShader);
 
 	// Top Rotor
-	glm::mat4 localTopRotor = glm::mat4();
-	//localTopRotor = glm::scale(localTopRotor, scaleVector);
-	localTopRotor = glm::translate(localTopRotor, glm::vec3(0.0f, 0.8f, -0.9f));
-	localTopRotor = glm::rotate(localTopRotor, rotate_y_top_rotor, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 globalTopRotor = globalBody * localTopRotor;
+	topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
+	glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
 	modelShader.SetMat4("model", globalTopRotor);
 	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
 	modelTopRotor.Draw(modelShader);
 
 	// Tail Rotor Left
-	glm::mat4 localTailLeftRotor = glm::mat4();
-	// translate
-	localTailLeftRotor = glm::translate(localTailLeftRotor, glm::vec3(-0.05f, -0.25f, 4.5f));
-	// rotation
-	localTailLeftRotor = glm::rotate(localTailLeftRotor, rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 globalTailLeftRotor = globalBody * localTailLeftRotor;
+	tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
+	glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
 	modelShader.SetMat4("model", globalTailLeftRotor);
 	modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
 	modelLeftTail.Draw(modelShader);
 
 	// Tail Rotor Right
-	glm::mat4 localTailRightRotor = glm::mat4();
-	localTailRightRotor = glm::translate(localTailRightRotor, glm::vec3(0.05f, -0.25f, 4.5f));
-	localTailRightRotor = glm::rotate(localTailRightRotor, -rotate_z_left_rotor, glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 globalTailRightRotor = globalBody * localTailRightRotor;
+	tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
+	glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
 	modelShader.SetMat4("model", globalTailRightRotor);
 	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
 	modelRightTail.Draw(modelShader);
@@ -232,6 +219,10 @@ void initScene()
 	model = glm::scale(model, scaleVector);
 
 	generateObjectBufferTeapot();
+
+	topRotorTransform.translateLocal(glm::vec3(0.0f, 0.8f, -0.9f));
+	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
+	tailRightRotorTransform.translateLocal(glm::vec3(0.05f, -0.25f, 4.5f));
 
 }
 
@@ -412,7 +403,7 @@ void loop()
 		if (delta > 16.0f)
 		{
 			rotate_y_top_rotor += 0.7f;
-			rotate_z_left_rotor += 0.1f;
+			rotate_z_left_rotor += 0.01f;
 
 			glm::vec3 eulerAngles(0.01f, 0.01f, 0.01f);
 			glm::quat MyQuaternion = glm::quat(eulerAngles);
