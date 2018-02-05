@@ -17,8 +17,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Object3D.h"
-
 class CModel
 {
 public:
@@ -26,8 +24,6 @@ public:
 	CModel(char *path);
 	void Draw(CShader shader);
 	void LoadModel(std::string path);
-
-	Object3D myObject;
 
 private:
 	std::vector<CMesh> vMeshes;

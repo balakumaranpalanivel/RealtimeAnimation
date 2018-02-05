@@ -6,6 +6,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 
 // Class Object3D
@@ -20,6 +21,7 @@ protected:
 	// coordinates to world-space coordinates
 	glm::mat4 mTransformMatrix;
 
+	bool isEuler = true;
 public:
 
 	// -------------------- Methods -------------------- //
@@ -60,6 +62,17 @@ public:
 	// Rotate the obejct in local-space using quat
 	void rotateLocalQuat(float rotateX,
 		float rotateY, float rotateZ);
+
+	// Rotate the obejct in local-space using quat
+	void rotateLocalSpecial(float rotateX,
+		float rotateY, float rotateZ);
+
+	// Toggle Rotation
+	inline void ToggleRotation() {
+		isEuler = !isEuler;
+	}
+
+	void Object3D::rotateLocalEuler(float rotateX, float rotateY, float rotateZ);
 
 	//// Rotate around a world-space point
 	//void rotateAroundWorldPoint(const glm::vec3& axis, float angle, const glm::vec3& point);
@@ -116,6 +129,26 @@ inline void Object3D::rotateLocalQuat(float rotateX,
 	glm::quat MyQuaternion = glm::quat(eulerAngles);
 
 	mTransformMatrix = mTransformMatrix * glm::toMat4(MyQuaternion);
+}
+
+inline void Object3D::rotateLocalEuler(float rotateX, float rotateY, float rotateZ)
+{
+	glm::mat4 X = glm::eulerAngleX(rotateX);
+	glm::mat4 Y = glm::eulerAngleY(rotateY);
+	glm::mat4 Z = glm::eulerAngleX(rotateZ);
+	mTransformMatrix = mTransformMatrix * Y * X * Z;
+}
+
+void Object3D::rotateLocalSpecial(float rotateX, float rotateY, float rotateZ)
+{
+	if (isEuler)
+	{
+		rotateLocalEuler(rotateX, rotateY, rotateZ);
+	}
+	else
+	{
+		rotateLocalQuat(rotateX, rotateY, rotateZ);
+	}
 }
 
 //// Rotate the object around a world-space point

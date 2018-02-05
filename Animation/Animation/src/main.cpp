@@ -37,6 +37,8 @@ CShader modelShader;
 CShader simpleShader;
 CShader skyBoxShader;
 
+bool IsEuler = true;
+
 CModel ourModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
 Object3D bodyTransform,
@@ -46,6 +48,7 @@ Object3D bodyTransform,
 
 glm::vec3 translateVector = glm::vec3(0.0f, -10.0f, 0.0f);
 glm::vec3 scaleVector = glm::vec3(0.5f, 0.5f, 0.5f);
+glm::vec3 eulerAngles;
 
 glm::mat4 model;
 glm::mat4 orthoProjection;
@@ -296,7 +299,7 @@ void MouseCallback(GLFWwindow *window, double xPos, double yPos)
 	lastX = xPos;
 	lastY = yPos;
 
-	newCamera.ProcessMouseMovement(xOffset, yOffset);
+	newCamera.ProcessMouseMovement(xOffset, yOffset, true);
 }
 
 void DoMovement()
@@ -366,14 +369,19 @@ void init()
 void ProcessInputs()
 {
 	float deltaAngle = 0.01f;
-	glm::vec3 eulerAngles;
 	glm::quat MyQuaternion;
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		bodyTransform.ToggleRotation();
+	}
 
 	// move front
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
 		bodyTransform.translateLocal(
 			glm::vec3(0.0f, 0.0f, -0.2f));
+		//newCamera.SetPosition(glm::vec3(0.0f, 0.0f, -0.2f));
 	}
 
 	// move back
@@ -386,36 +394,34 @@ void ProcessInputs()
 	// Pitch
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 	{
-		bodyTransform.rotateLocalQuat(deltaAngle, 0.0f, 0.0f);
+		bodyTransform.rotateLocalSpecial(deltaAngle, 0.0f, 0.0f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 	{
-		bodyTransform.rotateLocalQuat(-deltaAngle, 0.0f, 0.0f);
+		bodyTransform.rotateLocalSpecial(-deltaAngle, 0.0f, 0.0f);
 	}
 
 	// yaw
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
-		bodyTransform.rotateLocalQuat(0.0f,
-			deltaAngle, 0.0f);
+		bodyTransform.rotateLocalSpecial(0.0f, deltaAngle, 0.0f);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
-		bodyTransform.rotateLocalQuat(0.0f,
-			-deltaAngle, 0.0f);
+		bodyTransform.rotateLocalSpecial(0.0f, -deltaAngle, 0.0f);
 	}
 
 	// roll
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
-		bodyTransform.rotateLocalQuat(0.0f, 0.0f, deltaAngle);
+		bodyTransform.rotateLocalSpecial(0.0f, 0.0f, deltaAngle);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		bodyTransform.rotateLocalQuat(0.0f, 0.0f, -deltaAngle);
+		bodyTransform.rotateLocalSpecial(0.0f, 0.0f, -deltaAngle);
 	}
 }
 
