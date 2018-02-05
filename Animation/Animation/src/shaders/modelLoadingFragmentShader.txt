@@ -17,7 +17,7 @@ void main()
 	// Defining light - color(white), position, direction
 	// TODO_Future - Define Light in scene and pass it to the shader
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
-	vec3 lightPos = vec3(0.0f, 0.0f, 3.0f);
+	vec3 lightPos = vec3(-3.0f, 3.0f, -3.0f);
 	vec3 lightDir = normalize(lightPos - FragPos);
 
 	// BEGIN - Ambient light
