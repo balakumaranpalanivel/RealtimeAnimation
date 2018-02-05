@@ -410,8 +410,8 @@ void loop()
 		delta = (curr_time - last_time);
 		if (delta > 16.0f)
 		{
-			rotate_y_top_rotor += 0.7f;
-			rotate_z_left_rotor += 0.01f;
+			rotate_y_top_rotor = 0.7f;
+			rotate_z_left_rotor = 0.1f;
 
 			glm::vec3 eulerAngles(0.01f, 0.01f, 0.01f);
 			glm::quat MyQuaternion = glm::quat(eulerAngles);
@@ -462,10 +462,62 @@ unsigned int loadTexture(char const * path)
 	return textureID;
 }
 
+// loads a cubemap texture from 6 individual texture faces
+// order:
+// +X (right)
+// -X (left)
+// +Y (top)
+// -Y (bottom)
+// +Z (front) 
+// -Z (back)
+// -------------------------------------------------------
+unsigned int loadCubemap(vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrComponents;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
 int main(int argc, char** argv){
 	
 	//call it like this
 	drawGrid(10);
+
+	// load textures
+	// -------------
+	vector<std::string> faces
+	{
+		"../Animation/src/skybox/right.jpg",
+		"../Animation/src/skybox/left.jpg",
+		"../Animation/src/skybox/top.jpg",
+		"../Animation/src/skybox/bottom.jpg",
+		"../Animation/src/skybox/front.jpg",
+		"../Animation/src/skybox/back.jpg",
+	};
+	unsigned int cubemapTexture = loadCubemap(faces);
 
 	init();
 
