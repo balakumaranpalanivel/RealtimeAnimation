@@ -77,7 +77,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\stb;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>STB_IMAGE_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Assimp\lib\x86;$(SolutionDir)Dependencies\glfw\lib-vc2015;$(SolutionDir)Dependencies\glew\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -91,7 +91,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\stb;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>STB_IMAGE_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\Assimp\lib\x86;$(SolutionDir)Dependencies\glfw\lib-vc2015;$(SolutionDir)Dependencies\glew\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -107,7 +107,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\stb;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>STB_IMAGE_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -125,7 +125,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\stb;$(SolutionDir)Dependencies\glfw\include;$(SolutionDir)Dependencies\Assimp\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>STB_IMAGE_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
