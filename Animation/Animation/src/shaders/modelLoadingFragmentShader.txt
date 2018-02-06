@@ -5,15 +5,8 @@ in vec2 TexCoords;
 in vec3 ANormal;
 in vec3 FragPos;
 in vec3 ViewPos;
-in vec3 vFragColor;
-
-// Cube map
-in vec3 Normal;
-in vec3 Position;
 
 uniform sampler2D texture_diffuse1;
-uniform samplerCube skybox;
-
 void main()
 {    
 
@@ -23,7 +16,7 @@ void main()
 	// Defining light - color(white), position, direction
 	// TODO_Future - Define Light in scene and pass it to the shader
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
-	vec3 lightPos = vec3(-3.0f, 3.0f, -3.0f);
+	vec3 lightPos = vec3(0.0f, 0.0f, 3.0f);
 	vec3 lightDir = normalize(lightPos - FragPos);
 
 	// BEGIN - Ambient light
@@ -45,35 +38,6 @@ void main()
 	vec3 specular = specularStrength * spec * lightColor;
 	// END - Specular Effect
 
-	// REFLECTION - cube map
-    vec3 I = normalize(Position - ViewPos);
-    vec3 Reflect = reflect(I, normalize(Normal));
-	Reflect = texture(skybox, Reflect).rgb;
-
-	// REFRACTION - cube map
-	float Eta = 0.67;
-	vec3 refractColor;
-	refractColor.x = texture(skybox, refract(I, normalize(Normal), Eta - 0.3)).r;
-	refractColor.y = texture(skybox, refract(I, normalize(Normal), Eta - 0.1)).g;
-	refractColor.z = texture(skybox, refract(I, normalize(Normal), Eta - 0.25)).b;
-
-	// FRESNEL
-	float fresnelPower = 1.5;
-	float fresnelQuotient = ((1.0 - Eta) * (1.0 - Eta)) / ((1.0 + Eta) * (1.0 + Eta));
-	float fresnelRatio = fresnelQuotient + (1.0 - fresnelQuotient) * pow((1.0 - dot(-I, norm)), fresnelPower);
-
-	// FRESNEL - bias
-	float bias = 0.05;
-	float scale = 1.0;
-	float power = 0.8;
-	//R = max(0, min(1, bias + scale * (1.0 + I • N)power))
-	float fresnleRatioBias = max(0, min(1, bias + scale * pow((1.0 + dot(I, norm)), power)));
-
-	vec3 fresnelColor = mix(refractColor, Reflect, fresnleRatioBias);
-
 	// Compute the final color combining all the components
-	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f) + vec4(fresnelColor, 1.0);
-
-	// overwriting light with cubemap texture
-	FragColor = vec4(fresnelColor, 1.0);
+	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f)) * texture(texture_diffuse1, TexCoords);
 }

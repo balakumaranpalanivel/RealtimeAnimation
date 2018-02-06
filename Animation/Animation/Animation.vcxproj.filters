@@ -38,16 +38,22 @@
     <Text Include="src\shaders\simpleVertexShader.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="src\shaders\modelLoadingFragmentShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="src\shaders\modelLoadingVertexShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
     <Text Include="src\shaders\skyboxFragmentShader.txt">
       <Filter>Shaders</Filter>
     </Text>
     <Text Include="src\shaders\skyboxVertexShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="src\shaders\modelLoadingFragmentShader_Reflection.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="src\shaders\modelLoadingVertexShader_Reflection.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="src\shaders\modelLoadingFragmentShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="src\shaders\modelLoadingVertexShader.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>

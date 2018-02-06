@@ -142,10 +142,12 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="src\shaders\skyboxFragmentShader.txt" />
-    <Text Include="src\shaders\skyboxVertexShader.txt" />
     <Text Include="src\shaders\modelLoadingFragmentShader.txt" />
     <Text Include="src\shaders\modelLoadingVertexShader.txt" />
+    <Text Include="src\shaders\skyboxFragmentShader.txt" />
+    <Text Include="src\shaders\skyboxVertexShader.txt" />
+    <Text Include="src\shaders\modelLoadingFragmentShader_Reflection.txt" />
+    <Text Include="src\shaders\modelLoadingVertexShader_Reflection.txt" />
     <Text Include="src\shaders\simpleFragmentShader.txt" />
     <Text Include="src\shaders\simpleVertexShader.txt" />
   </ItemGroup>

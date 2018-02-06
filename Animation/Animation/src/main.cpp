@@ -33,7 +33,7 @@ const unsigned int SCR_HEIGHT = 800;
 
 using namespace std;
 
-CShader modelShader;
+CShader modelShader_Reflection;
 CShader simpleShader;
 CShader skyBoxShader;
 
@@ -197,46 +197,47 @@ void display()
 	simpleShader.SetMat4("model", glm::mat4());
 	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
-	modelShader.Use();
-	modelShader.SetMat4("projection", projection);
-	modelShader.SetMat4("view", newCamera.GetViewMatrix());
-	modelShader.SetVec3("viewPos", newCamera.GetPosition());
+	modelShader_Reflection.Use();
+	modelShader_Reflection.SetMat4("projection", projection);
+	modelShader_Reflection.SetMat4("view", newCamera.GetViewMatrix());
+	modelShader_Reflection.SetVec3("viewPos", newCamera.GetPosition());
 
 	glm::mat4 global1 = glm::mat4();
 
 	glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalBody);
-	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	modelBody.Draw(modelShader);
+	modelShader_Reflection.SetMat4("model", globalBody);
+	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	modelBody.Draw(modelShader_Reflection);
 
 	// Top Rotor
 	topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
 	glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalTopRotor);
-	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	modelTopRotor.Draw(modelShader);
+	modelShader_Reflection.SetMat4("model", globalTopRotor);
+	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	modelTopRotor.Draw(modelShader_Reflection);
 
 	// Tail Rotor Left
 	tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
 	glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalTailLeftRotor);
-	modelShader.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	modelLeftTail.Draw(modelShader);
+	modelShader_Reflection.SetMat4("model", globalTailLeftRotor);
+	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	modelLeftTail.Draw(modelShader_Reflection);
 
 	// Tail Rotor Right
 	tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
 	glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
-	modelShader.SetMat4("model", globalTailRightRotor);
-	modelShader.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
-	modelRightTail.Draw(modelShader);
+	modelShader_Reflection.SetMat4("model", globalTailRightRotor);
+	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	modelRightTail.Draw(modelShader_Reflection);
 }
 
 void initScene()
 {
 
 	// Set up the shaders
-	modelShader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
-		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
+	modelShader_Reflection.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Reflection.txt",
+		"../Animation/src/shaders/modelLoadingFragmentShader_Reflection.txt");
+
 	simpleShader.LoadShaders("../Animation/src/shaders/simpleVertexShader.txt",
 		"../Animation/src/shaders/simpleFragmentShader.txt");
 
