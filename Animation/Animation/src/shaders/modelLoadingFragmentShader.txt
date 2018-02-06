@@ -37,10 +37,6 @@ void main()
 	vec3 diffuse = diff * lightColor;
 	// END - Diffuse Effect
 
-	// Cube map indciden and reflected vector computation
-    vec3 I = normalize(Position - ViewPos);
-    vec3 R = reflect(I, normalize(Normal));
-
 	// BEGIN - Specular Effect
 	float specularStrength = 1.5;
 	vec3 viewDir = normalize(ViewPos - FragPos);
@@ -49,9 +45,26 @@ void main()
 	vec3 specular = specularStrength * spec * lightColor;
 	// END - Specular Effect
 
+	// REFLECTION - cube map
+    vec3 I = normalize(Position - ViewPos);
+    vec3 Reflect = reflect(I, normalize(Normal));
+	Reflect = texture(skybox, Reflect).rgb;
+
+	// REFRACTION - cube map
+	float Eta = 0.67;
+	vec3 Refract = refract(I, normalize(Normal), Eta);
+	Refract = texture(skybox, Refract).rgb;
+
+	// FRESNEL
+	float fresnelPower = 1.5;
+	float fresnelQuotient = ((1.0 - Eta) * (1.0 - Eta)) / ((1.0 + Eta) * (1.0 + Eta));
+	float fresnelRatio = fresnelQuotient + (1.0 - fresnelQuotient) * pow((1.0 - dot(-I, norm)), fresnelPower);
+	vec3 fresnelColor   = mix(Refract, Reflect, fresnelRatio);
+
 	// Compute the final color combining all the components
-	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f);
+	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f) + vec4(fresnelColor, 1.0);
+
 
 	// overwriting light with cubemap texture
-	FragColor = vec4(texture(skybox, R).rgb, 1.0);
+	FragColor = vec4(fresnelColor, 1.0);
 }
