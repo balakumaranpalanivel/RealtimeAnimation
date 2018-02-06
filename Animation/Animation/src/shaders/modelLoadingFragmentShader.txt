@@ -52,18 +52,19 @@ void main()
 
 	// REFRACTION - cube map
 	float Eta = 0.67;
-	vec3 Refract = refract(I, normalize(Normal), Eta);
-	Refract = texture(skybox, Refract).rgb;
+	vec3 refractColor;
+	refractColor.x = texture(skybox, refract(I, normalize(Normal), Eta - 0.3)).r;
+	refractColor.y = texture(skybox, refract(I, normalize(Normal), Eta - 0.1)).g;
+	refractColor.z = texture(skybox, refract(I, normalize(Normal), Eta - 0.25)).b;
 
 	// FRESNEL
 	float fresnelPower = 1.5;
 	float fresnelQuotient = ((1.0 - Eta) * (1.0 - Eta)) / ((1.0 + Eta) * (1.0 + Eta));
 	float fresnelRatio = fresnelQuotient + (1.0 - fresnelQuotient) * pow((1.0 - dot(-I, norm)), fresnelPower);
-	vec3 fresnelColor   = mix(Refract, Reflect, fresnelRatio);
+	vec3 fresnelColor = mix(refractColor, Reflect, fresnelRatio);
 
 	// Compute the final color combining all the components
 	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f) + vec4(fresnelColor, 1.0);
-
 
 	// overwriting light with cubemap texture
 	FragColor = vec4(fresnelColor, 1.0);
