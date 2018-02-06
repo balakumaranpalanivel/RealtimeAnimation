@@ -21,7 +21,7 @@ protected:
 	// coordinates to world-space coordinates
 	glm::mat4 mTransformMatrix;
 
-	bool isEuler = true;
+	bool isEuler = false;
 public:
 
 	// -------------------- Methods -------------------- //

@@ -37,8 +37,6 @@ CShader modelShader;
 CShader simpleShader;
 CShader skyBoxShader;
 
-bool IsEuler = true;
-
 CModel ourModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
 Object3D bodyTransform,
@@ -65,10 +63,10 @@ GLfloat lastY = SCR_HEIGHT / 2.0;
 
 float rotate_y_top_rotor = 0.0f,
 	rotate_z_left_rotor = 0.0f;
-
+bool isFPS = false;
 GLFWwindow* window;
 const GLFWvidmode* videMode;
-Camera newCamera;
+Camera newCamera(glm::vec3(0.0f, 1.5f, 2.0f));
 
 glm::mat4 bodyRotate = glm::mat4();
 glm::mat4 localBody = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -158,6 +156,10 @@ void generateObjectBufferTeapot() {
 
 void generateObjectBufferSkybox();
 
+glm::vec3 fwd = glm::vec3(0, 0, -1);
+glm::vec4 rght = glm::vec4(1, 0, 0, 0);
+glm::vec3 up = glm::vec3(0, 1, 0);
+
 void display()
 {
 
@@ -166,6 +168,11 @@ void display()
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glm::vec3 cameraPositionWRTHeli = glm::vec3(0.0f, 0.0f, 0.5f);
+	glm::vec3 cameraWorldPos = model * glm::vec4(cameraPositionWRTHeli, 1);
+	glm::vec3 lookAtPos = cameraWorldPos + fwd;
+	glm::mat4 view = glm::lookAt(cameraWorldPos, lookAtPos, glm::normalize(up));
 
 	// 
 	generateObjectBufferSkybox();
@@ -381,36 +388,60 @@ void ProcessInputs()
 	{
 		bodyTransform.translateLocal(
 			glm::vec3(0.0f, 0.0f, -0.2f));
-		//newCamera.SetPosition(glm::vec3(0.0f, 0.0f, -0.2f));
+		if (isFPS)
+		{
+			newCamera.UpdateFPSPosition(FORWARD, 0.17);
+		}
 	}
 
 	// move back
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		bodyTransform.translateLocal(
-			glm::vec3(0.0f, 0.0f, 0.2f));
+		bodyTransform.translateLocal(glm::vec3(0.0f, 0.0f, 0.2f));
+		if (isFPS)
+		{
+			
+		}
 	}
 
 	// Pitch
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalSpecial(deltaAngle, 0.0f, 0.0f);
+
+		if (isFPS)
+		{
+			newCamera.UpdateFPSOrientation(deltaAngle + 0.25, 0.0f);
+		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalSpecial(-deltaAngle, 0.0f, 0.0f);
+
+		if (isFPS)
+		{
+			newCamera.UpdateFPSOrientation(-deltaAngle - 0.25, 0.0f);
+		}
 	}
 
 	// yaw
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalSpecial(0.0f, deltaAngle, 0.0f);
+		if (isFPS)
+		{
+			newCamera.UpdateFPSOrientation(0.0f, -deltaAngle - 0.25);
+		}
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
 		bodyTransform.rotateLocalSpecial(0.0f, -deltaAngle, 0.0f);
+		if (isFPS)
+		{
+			newCamera.UpdateFPSOrientation(0.0f, +deltaAngle + 0.25);
+		}
 	}
 
 	// roll
