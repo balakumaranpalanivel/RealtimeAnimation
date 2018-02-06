@@ -263,7 +263,7 @@ void initScene()
 	//modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body_local.obj");
 
 	// Load the Nanosuit
-	nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
+	nanosuitModel.LoadModel("../Assets/Models/Ball/Ball.obj");
 
 	// translate it down so it's at the center of the scene
 	//model = glm::translate(model, translateVector);
@@ -277,8 +277,8 @@ void initScene()
 	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
 	tailRightRotorTransform.translateLocal(glm::vec3(0.05f, -0.25f, 4.5f));
 
-	nanosuitTransform.translateLocal(glm::vec3(0.0f, -5.0f, -10.0f));
-	nanosuitTransform.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));
+	nanosuitTransform.translateLocal(glm::vec3(0.0f, 0.0f, -5.0f));
+	//nanosuitTransform.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));
 }
 
 // Deltatime

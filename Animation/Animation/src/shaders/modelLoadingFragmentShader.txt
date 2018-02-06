@@ -7,9 +7,18 @@ in VS_OUT
 	in vec3 ANormal;
 	in vec3 FragPos;
 	in vec3 ViewPos;
+
+	// tangent space
+	vec3 FragNormal;
+	vec3 lightPos;
+	vec3 TangentLightPos;
+    vec3 TangentViewPos;
+    vec3 TangentFragPos;
 } fs_in;
 
 uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_normal1;
+
 void main()
 {    
 
@@ -19,8 +28,7 @@ void main()
 	// Defining light - color(white), position, direction
 	// TODO_Future - Define Light in scene and pass it to the shader
 	vec3 lightColor = vec3(1.0f, 1.0f, 1.0f);
-	vec3 lightPos = vec3(0.0f, 0.0f, 3.0f);
-	vec3 lightDir = normalize(lightPos - fs_in.FragPos);
+	vec3 lightDir = normalize(fs_in.lightPos - fs_in.FragPos);
 
 	// BEGIN - Ambient light
 	float ambientPower = 0.01;
