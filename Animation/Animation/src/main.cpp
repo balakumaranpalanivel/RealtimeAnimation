@@ -34,10 +34,11 @@ const unsigned int SCR_HEIGHT = 800;
 using namespace std;
 
 CShader modelShader_Reflection;
+CShader modelLoader;
 CShader simpleShader;
 CShader skyBoxShader;
 
-CModel ourModel, modelTopRotor, modelMachineGun,
+CModel nanosuitModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
 Object3D bodyTransform,
 	topRotorTransform,
@@ -197,60 +198,77 @@ void display()
 	simpleShader.SetMat4("model", glm::mat4());
 	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
-	modelShader_Reflection.Use();
-	modelShader_Reflection.SetMat4("projection", projection);
-	modelShader_Reflection.SetMat4("view", newCamera.GetViewMatrix());
-	modelShader_Reflection.SetVec3("viewPos", newCamera.GetPosition());
+	modelLoader.Use();
 
-	glm::mat4 global1 = glm::mat4();
+	// Perspective projection viewport
+	//glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
+	modelLoader.SetMat4("projection", projection);
+	modelLoader.SetMat4("view", newCamera.GetViewMatrix());
+	modelLoader.SetMat4("model", glm::mat4());
+	modelLoader.SetVec3("viewPos", newCamera.GetPosition());
+	nanosuitModel.Draw(modelLoader);
 
-	glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
-	modelShader_Reflection.SetMat4("model", globalBody);
-	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	modelBody.Draw(modelShader_Reflection);
+	//modelShader_Reflection.Use();
+	//modelShader_Reflection.SetMat4("projection", projection);
+	//modelShader_Reflection.SetMat4("view", newCamera.GetViewMatrix());
+	//modelShader_Reflection.SetVec3("viewPos", newCamera.GetPosition());
 
-	// Top Rotor
-	topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
-	glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
-	modelShader_Reflection.SetMat4("model", globalTopRotor);
-	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	modelTopRotor.Draw(modelShader_Reflection);
+	//glm::mat4 global1 = glm::mat4();
 
-	// Tail Rotor Left
-	tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
-	glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
-	modelShader_Reflection.SetMat4("model", globalTailLeftRotor);
-	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	modelLeftTail.Draw(modelShader_Reflection);
+	//glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
+	//modelShader_Reflection.SetMat4("model", globalBody);
+	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	//modelBody.Draw(modelShader_Reflection);
 
-	// Tail Rotor Right
-	tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
-	glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
-	modelShader_Reflection.SetMat4("model", globalTailRightRotor);
-	modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
-	modelRightTail.Draw(modelShader_Reflection);
+	//// Top Rotor
+	//topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
+	//glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
+	//modelShader_Reflection.SetMat4("model", globalTopRotor);
+	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
+	//modelTopRotor.Draw(modelShader_Reflection);
+
+	//// Tail Rotor Left
+	//tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
+	//glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
+	//modelShader_Reflection.SetMat4("model", globalTailLeftRotor);
+	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
+	//modelLeftTail.Draw(modelShader_Reflection);
+
+	//// Tail Rotor Right
+	//tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
+	//glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
+	//modelShader_Reflection.SetMat4("model", globalTailRightRotor);
+	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
+	//modelRightTail.Draw(modelShader_Reflection);
 }
 
 void initScene()
 {
 
 	// Set up the shaders
-	modelShader_Reflection.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Reflection.txt",
-		"../Animation/src/shaders/modelLoadingFragmentShader_Reflection.txt");
+	modelLoader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
+		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
 
-	simpleShader.LoadShaders("../Animation/src/shaders/simpleVertexShader.txt",
-		"../Animation/src/shaders/simpleFragmentShader.txt");
+	//modelShader_Reflection.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Reflection.txt",
+	//	"../Animation/src/shaders/modelLoadingFragmentShader_Reflection.txt");
+
+	//simpleShader.LoadShaders("../Animation/src/shaders/simpleVertexShader.txt",
+	//	"../Animation/src/shaders/simpleFragmentShader.txt");
 
 	// Skybox shaders
 	skyBoxShader.LoadShaders("../Animation/src/shaders/skyboxVertexShader.txt",
 		"../Animation/src/shaders/skyboxFragmentShader.txt");
 
-	// Load 3D Model from a seperate file
-	modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor_local.obj");
-	modelMachineGun.LoadModel("../Assets/Models/helicopter/helicopter_machine_gun.obj");
-	modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
-	modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
-	modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body_local.obj");
+
+	//// Load 3D Model from a seperate file
+	//modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor_local.obj");
+	//modelMachineGun.LoadModel("../Assets/Models/helicopter/helicopter_machine_gun.obj");
+	//modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
+	//modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
+	//modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body_local.obj");
+
+	// Load the Nanosuit
+	nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
 
 	// translate it down so it's at the center of the scene
 	model = glm::translate(model, translateVector);
