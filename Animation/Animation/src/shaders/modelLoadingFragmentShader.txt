@@ -61,7 +61,15 @@ void main()
 	float fresnelPower = 1.5;
 	float fresnelQuotient = ((1.0 - Eta) * (1.0 - Eta)) / ((1.0 + Eta) * (1.0 + Eta));
 	float fresnelRatio = fresnelQuotient + (1.0 - fresnelQuotient) * pow((1.0 - dot(-I, norm)), fresnelPower);
-	vec3 fresnelColor = mix(refractColor, Reflect, fresnelRatio);
+
+	// FRESNEL - bias
+	float bias = 0.05;
+	float scale = 1.0;
+	float power = 0.8;
+	//R = max(0, min(1, bias + scale * (1.0 + I • N)power))
+	float fresnleRatioBias = max(0, min(1, bias + scale * pow((1.0 + dot(I, norm)), power)));
+
+	vec3 fresnelColor = mix(refractColor, Reflect, fresnleRatioBias);
 
 	// Compute the final color combining all the components
 	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f) + vec4(fresnelColor, 1.0);
