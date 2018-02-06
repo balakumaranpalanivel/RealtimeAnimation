@@ -9,6 +9,10 @@ out vec3 FragPos;
 out vec3 ViewPos;
 out vec3 vFragColor;
 
+// Output for cubemap
+out vec3 Normal;
+out vec3 Position;
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -21,6 +25,10 @@ void main()
 	ANormal = mat3(transpose(inverse(model))) * aNormal;
 	FragPos = vec3(model*vec4(aPos, 1.0));
 	ViewPos = viewPos;
+
+	// Cubemap
+	Normal = mat3(transpose(inverse(model))) * aNormal;
+	Position = vec3(model * vec4(aPos, 1.0));
 
 	vFragColor = aFragColor;
     gl_Position = projection * view * model * vec4(aPos, 1.0);

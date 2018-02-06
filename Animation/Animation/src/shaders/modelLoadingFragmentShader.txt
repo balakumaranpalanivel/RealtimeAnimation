@@ -7,7 +7,13 @@ in vec3 FragPos;
 in vec3 ViewPos;
 in vec3 vFragColor;
 
+// Cube map
+in vec3 Normal;
+in vec3 Position;
+
 uniform sampler2D texture_diffuse1;
+uniform samplerCube skybox;
+
 void main()
 {    
 
