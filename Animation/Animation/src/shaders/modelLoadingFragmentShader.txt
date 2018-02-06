@@ -37,6 +37,10 @@ void main()
 	vec3 diffuse = diff * lightColor;
 	// END - Diffuse Effect
 
+	// Cube map indciden and reflected vector computation
+    vec3 I = normalize(Position - ViewPos);
+    vec3 R = reflect(I, normalize(Normal));
+
 	// BEGIN - Specular Effect
 	float specularStrength = 1.5;
 	vec3 viewDir = normalize(ViewPos - FragPos);
@@ -47,5 +51,7 @@ void main()
 
 	// Compute the final color combining all the components
 	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f);
-	//FragColor = vec4(vFragColor, 1.0f);
+
+	// overwriting light with cubemap texture
+	FragColor = vec4(texture(skybox, R).rgb, 1.0);
 }
