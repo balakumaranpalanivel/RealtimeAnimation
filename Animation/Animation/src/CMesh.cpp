@@ -60,6 +60,7 @@ void CMesh::Draw(CShader shader)
 {
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
+	unsigned int normalNr = 1;
 
 	for (unsigned int i = 0; i < vTextures.size(); i++)
 	{
@@ -76,6 +77,10 @@ void CMesh::Draw(CShader shader)
 		{
 			ss << specularNr++;
 		}
+		else if (TYPE_NORMAL_SHADER == name)
+		{
+			ss << normalNr++;
+		}
 
 		number = ss.str();
 
@@ -87,7 +92,6 @@ void CMesh::Draw(CShader shader)
 
 	// draw the mesh
 	glBindVertexArray(glnVAO);
-	// Set the model matrix here
 	glDrawElements(GL_TRIANGLES, vIndices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

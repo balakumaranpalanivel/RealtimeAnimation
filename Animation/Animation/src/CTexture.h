@@ -9,6 +9,7 @@
 
 #define TYPE_DIFFUSE_SHADER		"texture_diffuse"
 #define TYPE_SPECULAR_SHADER	"texture_specular"
+#define TYPE_NORMAL_SHADER		"texture_normal"
 
 struct CTexture
 {

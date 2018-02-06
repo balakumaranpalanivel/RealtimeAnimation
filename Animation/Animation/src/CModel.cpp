@@ -26,7 +26,7 @@ void CModel::Draw(CShader shader)
 void CModel::LoadModel(std::string path)
 {
 	Assimp::Importer importer;
-	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -78,6 +78,11 @@ CMesh CModel::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 		vector.z = mesh->mNormals[i].z;
 		vertex.v3Normal = vector;
 
+		vector.x = mesh->mTangents[i].x;
+		vector.y = mesh->mTangents[i].y;
+		vector.z = mesh->mTangents[i].z;
+		vertex.vTangent = vector;
+
 		// TODO: CAN CONTAIN UPTO 8 TEXTURE CO-ORDINATES
 		// does the mesh contain texture co ordinates
 		if (mesh->mTextureCoords[0])
@@ -113,6 +118,10 @@ CMesh CModel::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 		std::vector<CTexture> specularMaps = LoadMaterialTextures(material,
 			aiTextureType_SPECULAR, TYPE_SPECULAR_SHADER);
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+		std::vector<CTexture> normalTexture = LoadMaterialTextures(material,
+			aiTextureType_HEIGHT, TYPE_NORMAL_SHADER);
+		textures.insert(textures.end(), normalTexture.begin(), normalTexture.end());
 	}
 
 	return CMesh(vertices, indices, textures);
