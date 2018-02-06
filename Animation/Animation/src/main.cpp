@@ -40,6 +40,8 @@ CShader skyBoxShader;
 
 CModel nanosuitModel, modelTopRotor, modelMachineGun,
 		modelLeftTail, modelRightTail, modelBody;
+Object3D nanosuitTransform;
+
 Object3D bodyTransform,
 	topRotorTransform,
 	tailLeftRotorTransform,
@@ -67,7 +69,7 @@ float rotate_y_top_rotor = 0.0f,
 bool isFPS = false;
 GLFWwindow* window;
 const GLFWvidmode* videMode;
-Camera newCamera(glm::vec3(0.0f, 1.5f, 2.0f));
+Camera newCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
 glm::mat4 bodyRotate = glm::mat4();
 glm::mat4 localBody = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -170,12 +172,6 @@ void display()
 	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::vec3 cameraPositionWRTHeli = glm::vec3(0.0f, 0.0f, 0.5f);
-	glm::vec3 cameraWorldPos = model * glm::vec4(cameraPositionWRTHeli, 1);
-	glm::vec3 lookAtPos = cameraWorldPos + fwd;
-	glm::mat4 view = glm::lookAt(cameraWorldPos, lookAtPos, glm::normalize(up));
-
-	// 
 	generateObjectBufferSkybox();
 
 	projection = glm::perspective(newCamera.GetZoom(), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 100.0f);
@@ -201,10 +197,9 @@ void display()
 	modelLoader.Use();
 
 	// Perspective projection viewport
-	//glViewport(0, 0, SCR_WIDTH / 2, SCR_HEIGHT);
 	modelLoader.SetMat4("projection", projection);
 	modelLoader.SetMat4("view", newCamera.GetViewMatrix());
-	modelLoader.SetMat4("model", glm::mat4());
+	modelLoader.SetMat4("model", nanosuitTransform.getTransformMatrix());
 	modelLoader.SetVec3("viewPos", newCamera.GetPosition());
 	nanosuitModel.Draw(modelLoader);
 
@@ -271,10 +266,10 @@ void initScene()
 	nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
 
 	// translate it down so it's at the center of the scene
-	model = glm::translate(model, translateVector);
+	//model = glm::translate(model, translateVector);
 
 	// scale the model to fit the viewports
-	model = glm::scale(model, scaleVector);
+	//model = glm::scale(model, scaleVector);
 
 	//generateObjectBufferTeapot();
 
@@ -282,6 +277,8 @@ void initScene()
 	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
 	tailRightRotorTransform.translateLocal(glm::vec3(0.05f, -0.25f, 4.5f));
 
+	nanosuitTransform.translateLocal(glm::vec3(0.0f, -5.0f, -10.0f));
+	nanosuitTransform.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));
 }
 
 // Deltatime

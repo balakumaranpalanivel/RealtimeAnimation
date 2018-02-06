@@ -53,6 +53,9 @@ public:
 	// Translate the object in local-space
 	void translateLocal(const glm::vec3& v);
 
+	// Scale the object in local-space
+	void scaleLocal(glm::vec3 scaleVector);
+
 	// Rotate the object in world-space
 	//void rotateWorld(const glm::vec3& axis, float angle);
 
@@ -82,6 +85,12 @@ public:
 
 	//void SetChild(Object3D child);
 };
+
+//
+void Object3D::scaleLocal(glm::vec3 scaleVector)
+{
+	mTransformMatrix = glm::scale(mTransformMatrix, scaleVector);
+}
 
 // Return the transform matrix
 inline const glm::mat4& Object3D::getTransformMatrix() const {
