@@ -34,7 +34,7 @@ const unsigned int SCR_HEIGHT = 800;
 using namespace std;
 
 CShader modelShader_Reflection;
-CShader modelLoader;
+CShader mdoelLoader_Normal;
 CShader simpleShader;
 CShader skyBoxShader;
 
@@ -194,14 +194,15 @@ void display()
 	simpleShader.SetMat4("model", glm::mat4());
 	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
-	modelLoader.Use();
+	mdoelLoader_Normal.Use();
 
 	// Perspective projection viewport
-	modelLoader.SetMat4("projection", projection);
-	modelLoader.SetMat4("view", newCamera.GetViewMatrix());
-	modelLoader.SetMat4("model", nanosuitTransform.getTransformMatrix());
-	modelLoader.SetVec3("viewPos", newCamera.GetPosition());
-	nanosuitModel.Draw(modelLoader);
+	nanosuitTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
+	mdoelLoader_Normal.SetMat4("projection", projection);
+	mdoelLoader_Normal.SetMat4("view", newCamera.GetViewMatrix());
+	mdoelLoader_Normal.SetMat4("model", nanosuitTransform.getTransformMatrix());
+	mdoelLoader_Normal.SetVec3("viewPos", newCamera.GetPosition());
+	nanosuitModel.Draw(mdoelLoader_Normal);
 
 	//modelShader_Reflection.Use();
 	//modelShader_Reflection.SetMat4("projection", projection);
@@ -241,8 +242,8 @@ void initScene()
 {
 
 	// Set up the shaders
-	modelLoader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
-		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
+	mdoelLoader_Normal.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Normal.txt",
+		"../Animation/src/shaders/modelLoadingFragmentShader_Normal.txt");
 
 	//modelShader_Reflection.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Reflection.txt",
 	//	"../Animation/src/shaders/modelLoadingFragmentShader_Reflection.txt");
@@ -263,7 +264,9 @@ void initScene()
 	//modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body_local.obj");
 
 	// Load the Nanosuit
-	nanosuitModel.LoadModel("../Assets/Models/Ball/Ball.obj");
+	nanosuitModel.LoadModel("../Assets/Models/BB8/bb8.obj");
+	//nanosuitModel.LoadModel("../Assets/Models/ball/ball.obj");
+	//nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
 
 	// translate it down so it's at the center of the scene
 	//model = glm::translate(model, translateVector);
@@ -277,8 +280,8 @@ void initScene()
 	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
 	tailRightRotorTransform.translateLocal(glm::vec3(0.05f, -0.25f, 4.5f));
 
-	nanosuitTransform.translateLocal(glm::vec3(0.0f, 0.0f, -5.0f));
-	//nanosuitTransform.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));
+	nanosuitTransform.translateLocal(glm::vec3(0.0f, -5.0f, -5.0f));
+	nanosuitTransform.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));
 }
 
 // Deltatime
@@ -490,7 +493,7 @@ void loop()
 		delta = (curr_time - last_time);
 		if (delta > 16.0f)
 		{
-			rotate_y_top_rotor = 0.7f;
+			rotate_y_top_rotor = 0.01f;
 			rotate_z_left_rotor = 0.1f;
 
 			glm::vec3 eulerAngles(0.01f, 0.01f, 0.01f);

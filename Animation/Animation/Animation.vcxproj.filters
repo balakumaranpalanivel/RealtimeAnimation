@@ -50,10 +50,10 @@
     <Text Include="src\shaders\modelLoadingVertexShader_Reflection.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="src\shaders\modelLoadingFragmentShader.txt">
+    <Text Include="src\shaders\modelLoadingFragmentShader_Normal.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="src\shaders\modelLoadingVertexShader.txt">
+    <Text Include="src\shaders\modelLoadingVertexShader_Normal.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>
