@@ -42,9 +42,6 @@ void main()
 	T = normalize(T - dot(T, N) * N);
 	vec3 B = cross(N, T);
 
-	if (dot(cross(N, T), B) < 0.0)
-					T = T * -1.0;
-
 	// TBN
     mat3 TBN = transpose(mat3(T, B, N));
     vs_out.TangentLightPos = TBN * lightPosition;
