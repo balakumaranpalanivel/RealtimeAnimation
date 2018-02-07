@@ -8,6 +8,7 @@
 #define LENGTH_POSITION				3
 #define LENGTH_NORMALS				3
 #define LENGTH_TEXTURE_COORDINATES	2
+#define LENGTH_TANGENT				3
 
 struct CVertex
 {

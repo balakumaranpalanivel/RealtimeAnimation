@@ -53,6 +53,11 @@ void CMesh::SetupMesh()
 	glVertexAttribPointer(2, LENGTH_TEXTURE_COORDINATES, GL_FLOAT, GL_FALSE, sizeof(CVertex),
 		(void*)offsetof(CVertex, v2TexCoords));
 
+	// vertex tangents
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, LENGTH_TANGENT, GL_FLOAT, GL_FALSE, sizeof(CVertex),
+		(void*)offsetof(CVertex, vTangent));
+
 	glBindVertexArray(0);
 }
 
