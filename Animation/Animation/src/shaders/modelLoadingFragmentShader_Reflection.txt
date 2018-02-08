@@ -13,6 +13,9 @@ in vec3 Position;
 
 uniform sampler2D texture_diffuse1;
 uniform samplerCube skybox;
+uniform bool isReflect;
+uniform bool isRefract;
+uniform bool isFresnel;
 
 void main()
 {    
@@ -75,5 +78,11 @@ void main()
 	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f))  * vec4(vFragColor, 1.0f) + vec4(fresnelColor, 1.0);
 
 	// overwriting light with cubemap texture
+
+	FragColor = vec4(Reflect, 1.0);
+
+	FragColor = vec4(refractColor, 1.0);
+
 	FragColor = vec4(fresnelColor, 1.0);
+
 }
