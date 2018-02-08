@@ -281,8 +281,8 @@ void initScene()
 
 	// Load the Nanosuit
 	//nanosuitModel.LoadModel("../Assets/Models/BB8/bb8.obj");
-	nanosuitModel.LoadModel("../Assets/Models/ball/ball.obj");
-	//nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
+	//nanosuitModel.LoadModel("../Assets/Models/ball/ball.obj");
+	nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
 
 	// translate it down so it's at the center of the scene
 	//model = glm::translate(model, translateVector);
