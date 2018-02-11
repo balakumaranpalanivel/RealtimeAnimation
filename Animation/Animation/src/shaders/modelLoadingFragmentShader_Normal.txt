@@ -17,6 +17,8 @@ in VS_OUT
 	mat3 TBN;
 } fs_in;
 
+// REFERENCES - https://learnopengl.com/Advanced-Lighting/Normal-Mapping
+// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_normal1;
 
@@ -60,5 +62,4 @@ void main()
 
 	// Compute the final color combining all the components
 	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f)) * texture(texture_diffuse1, fs_in.TexCoords) * 2;
-	//FragColor = vec4(result, 1.0f);
 }
