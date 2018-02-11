@@ -456,11 +456,20 @@ void ProcessInputs()
 		bodyTransform.rotateLocalSpecial(0.0f, 0.0f, -deltaAngle);
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+	{
+		modelShader_Reflection.SetBool("isReflect", false);
+		modelShader_Reflection.SetBool("isRefract", false);
+		modelShader_Reflection.SetBool("isFresnel", false);
+		modelShader_Reflection.SetBool("isDiffuse", true);
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
 	{
 		modelShader_Reflection.SetBool("isReflect", true);
 		modelShader_Reflection.SetBool("isRefract", false);
 		modelShader_Reflection.SetBool("isFresnel", false);
+		modelShader_Reflection.SetBool("isDiffuse", false);
 
 	}
 
@@ -469,6 +478,7 @@ void ProcessInputs()
 		modelShader_Reflection.SetBool("isReflect", false);
 		modelShader_Reflection.SetBool("isRefract", true);
 		modelShader_Reflection.SetBool("isFresnel", false);
+		modelShader_Reflection.SetBool("isDiffuse", false);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
@@ -476,6 +486,7 @@ void ProcessInputs()
 		modelShader_Reflection.SetBool("isReflect", false);
 		modelShader_Reflection.SetBool("isRefract", false);
 		modelShader_Reflection.SetBool("isFresnel", true);
+		modelShader_Reflection.SetBool("isDiffuse", false);
 	}
 }
 
