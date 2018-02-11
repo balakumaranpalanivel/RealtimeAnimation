@@ -18,6 +18,11 @@ uniform bool isRefract;
 uniform bool isFresnel;
 uniform bool isDiffuse;
 
+// REFRENCES
+// Reflection & cubemap - https://learnopengl.com/Advanced-OpenGL/Cubemaps
+// Refraction & chromatic dispersion - http://www.geeks3d.com/20101008/shader-library-chromatic-aberration-demo-glsl/
+// Fresnel - http://kylehalladay.com/blog/tutorial/2014/02/18/Fresnel-Shaders-From-The-Ground-Up.html
+
 void main()
 {    
 	
@@ -66,7 +71,7 @@ void main()
 	float fresnelQuotient = ((1.0 - Eta) * (1.0 - Eta)) / ((1.0 + Eta) * (1.0 + Eta));
 	float fresnelRatio = fresnelQuotient + (1.0 - fresnelQuotient) * pow((1.0 - dot(-I, norm)), fresnelPower);
 
-	// FRESNEL - bias
+	// FRESNEL - using bias, scale and power
 	float bias = 0.05;
 	float scale = 1.0;
 	float power = 0.8;

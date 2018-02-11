@@ -258,8 +258,6 @@ void initScene()
 	// scale the model to fit the viewports
 	model = glm::scale(model, scaleVector);
 
-	//generateObjectBufferTeapot();
-
 	topRotorTransform.translateLocal(glm::vec3(0.0f, 0.8f, -0.9f));
 	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
 	tailRightRotorTransform.translateLocal(glm::vec3(0.05f, -0.25f, 4.5f));
