@@ -50,7 +50,7 @@ Object3D bodyTransform,
 	tailRightRotorTransform;
 
 glm::vec3 translateVector = glm::vec3(0.0f, -10.0f, 0.0f);
-glm::vec3 scaleVector = glm::vec3(0.5f, 0.5f, 0.5f);
+glm::vec3 scaleVector = glm::vec3(10.0f, 10.0f, 10.0f);
 glm::vec3 eulerAngles;
 
 glm::mat4 model;
@@ -71,7 +71,6 @@ float rotate_y_top_rotor = 0.0f,
 bool isFPS = false;
 GLFWwindow* window;
 const GLFWvidmode* videMode;
-Camera newCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
 glm::mat4 bodyRotate = glm::mat4();
 glm::mat4 localBody = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -164,6 +163,8 @@ void generateObjectBufferSkybox();
 glm::vec3 fwd = glm::vec3(0, 0, -1);
 glm::vec4 rght = glm::vec4(1, 0, 0, 0);
 glm::vec3 up = glm::vec3(0, 1, 0);
+Camera newCamera(glm::vec3(0.0f, 10.0f, 10.0f));
+//Camera newCamera(glm::vec3(0.0f, 1000.0f, 1000.0f));
 
 void display()
 {
@@ -176,7 +177,7 @@ void display()
 
 	generateObjectBufferSkybox();
 
-	projection = glm::perspective(newCamera.GetZoom(), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 100.0f);
+	projection = glm::perspective(newCamera.GetZoom(), (GLfloat)SCR_WIDTH / (GLfloat)SCR_HEIGHT, 0.1f, 100000.0f);
 
 	glDepthMask(GL_FALSE);
 	skyBoxShader.Use();
@@ -196,108 +197,40 @@ void display()
 	simpleShader.SetMat4("model", glm::mat4());
 	glDrawElements(GL_LINES, element_buffer_length, GL_UNSIGNED_INT, 0);
 
-	modelLoader_Normal.Use();
+	//modelLoader_Normal.Use();
+	modelLoader.Use();
 
 	// Perspective projection viewport
-	nanosuitTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
+	//nanosuitTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
 	modelLoader_Normal.SetMat4("projection", projection);
 	modelLoader_Normal.SetMat4("view", newCamera.GetViewMatrix());
 	modelLoader_Normal.SetMat4("model", nanosuitTransform.getTransformMatrix());
 	modelLoader_Normal.SetVec3("viewPos", newCamera.GetPosition());
-	nanosuitModel.Draw(modelLoader_Normal);
-
-
-	modelLoader.Use();
-
-	// Perspective projection viewport
-	nanosuitTransform1.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
-	modelLoader.SetMat4("projection", projection);
-	modelLoader.SetMat4("view", newCamera.GetViewMatrix());
-	modelLoader.SetMat4("model", nanosuitTransform1.getTransformMatrix());
-	modelLoader.SetVec3("viewPos", newCamera.GetPosition());
 	nanosuitModel.Draw(modelLoader);
-
-	//modelShader_Reflection.Use();
-	//modelShader_Reflection.SetMat4("projection", projection);
-	//modelShader_Reflection.SetMat4("view", newCamera.GetViewMatrix());
-	//modelShader_Reflection.SetVec3("viewPos", newCamera.GetPosition());
-
-	//glm::mat4 global1 = glm::mat4();
-
-	//glm::mat4 globalBody = global1 * bodyTransform.getTransformMatrix();
-	//modelShader_Reflection.SetMat4("model", globalBody);
-	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	//modelBody.Draw(modelShader_Reflection);
-
-	//// Top Rotor
-	//topRotorTransform.rotateLocalQuat(0.0f, rotate_y_top_rotor, 0.0f);
-	//glm::mat4 globalTopRotor = globalBody * topRotorTransform.getTransformMatrix();
-	//modelShader_Reflection.SetMat4("model", globalTopRotor);
-	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 0.0f, 0.0f));
-	//modelTopRotor.Draw(modelShader_Reflection);
-
-	//// Tail Rotor Left
-	//tailLeftRotorTransform.rotateLocalQuat(rotate_z_left_rotor, 0.0f, 0.0f);
-	//glm::mat4 globalTailLeftRotor = globalBody * tailLeftRotorTransform.getTransformMatrix();
-	//modelShader_Reflection.SetMat4("model", globalTailLeftRotor);
-	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(0.0f, 0.0f, 1.0f));
-	//modelLeftTail.Draw(modelShader_Reflection);
-
-	//// Tail Rotor Right
-	//tailRightRotorTransform.rotateLocalQuat(-rotate_z_left_rotor, 0.0f, 0.0f);
-	//glm::mat4 globalTailRightRotor = globalBody * tailRightRotorTransform.getTransformMatrix();
-	//modelShader_Reflection.SetMat4("model", globalTailRightRotor);
-	//modelShader_Reflection.SetVec3("aFragColor", glm::vec3(1.0f, 1.0f, 0.0f));
-	//modelRightTail.Draw(modelShader_Reflection);
+	modelLoader.Use();
 }
 
 void initScene()
 {
 
-	// Set up the shaders
-	modelLoader_Normal.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Normal.txt",
-		"../Animation/src/shaders/modelLoadingFragmentShader_Normal.txt");
+	nanosuitTransform.translateLocal(glm::vec3(0.0f, -5.0f, -5.0f));
+	
+	nanosuitTransform.scaleLocal(glm::vec3(1.0f, 1.0f, 1.0f));
+	newCamera.movementSpeed = 6.0f;
 
 	modelLoader.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader.txt",
 		"../Animation/src/shaders/modelLoadingFragmentShader.txt");
-
-	//modelShader_Reflection.LoadShaders("../Animation/src/shaders/modelLoadingVertexShader_Reflection.txt",
-	//	"../Animation/src/shaders/modelLoadingFragmentShader_Reflection.txt");
-
-	//simpleShader.LoadShaders("../Animation/src/shaders/simpleVertexShader.txt",
-	//	"../Animation/src/shaders/simpleFragmentShader.txt");
 
 	// Skybox shaders
 	skyBoxShader.LoadShaders("../Animation/src/shaders/skyboxVertexShader.txt",
 		"../Animation/src/shaders/skyboxFragmentShader.txt");
 
+	nanosuitModel.LoadModel("../Assets/Models/city/Street environment_V01.obj");
 
-	//// Load 3D Model from a seperate file
-	//modelTopRotor.LoadModel("../Assets/Models/helicopter/helicopter_top_rotor_local.obj");
-	//modelMachineGun.LoadModel("../Assets/Models/helicopter/helicopter_machine_gun.obj");
-	//modelLeftTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
-	//modelRightTail.LoadModel("../Assets/Models/helicopter/helicopter_left_tail_spin_local.obj");
-	//modelBody.LoadModel("../Assets/Models/helicopter/helicopter_body_local.obj");
-
-	// Load the Nanosuit
-	//nanosuitModel.LoadModel("../Assets/Models/BB8/bb8.obj");
-	//nanosuitModel.LoadModel("../Assets/Models/ball/ball.obj");
-	nanosuitModel.LoadModel("../Assets/Models/nanosuit/nanosuit.obj");
-
-	// translate it down so it's at the center of the scene
-	//model = glm::translate(model, translateVector);
-
-	// scale the model to fit the viewports
-	//model = glm::scale(model, scaleVector);
-
-	//generateObjectBufferTeapot();
 
 	topRotorTransform.translateLocal(glm::vec3(0.0f, 0.8f, -0.9f));
 	tailLeftRotorTransform.translateLocal(glm::vec3(-0.05f, -0.25f, 4.5f));
 	tailRightRotorTransform.translateLocal(glm::vec3(0.05f, -0.25f, 4.5f));
-
-	nanosuitTransform.translateLocal(glm::vec3(0.0f, -5.0f, -5.0f));
-	nanosuitTransform.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));
 
 	nanosuitTransform1.translateLocal(glm::vec3(5.0f, -5.0f, -5.0f));
 	nanosuitTransform1.scaleLocal(glm::vec3(0.5f, 0.5f, 0.5f));

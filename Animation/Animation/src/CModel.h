@@ -24,6 +24,7 @@ public:
 	CModel(char *path);
 	void Draw(CShader shader);
 	void LoadModel(std::string path);
+	bool mIsMipMap = false;
 
 private:
 	std::vector<CMesh> vMeshes;

@@ -157,7 +157,6 @@ public:
 		ProcessKeyboard(direction, deltaTime);
 	}
 
-private:
 	// Camera Attributes
 	glm::vec3 position;
 	glm::vec3 front;

@@ -40,4 +40,6 @@ void main()
 
 	// Compute the final color combining all the components
 	FragColor = (vec4(ambient, 1.0f) + vec4(diffuse, 1.0f) + vec4(specular, 1.0f)) * texture(texture_diffuse1, TexCoords) * 2;
+
+	FragColor = texture(texture_diffuse1, TexCoords);
 }
